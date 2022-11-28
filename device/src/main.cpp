@@ -3,11 +3,14 @@
 
 BluetoothSerial Bluetooth;
 
-void setup(){
-	Serial.begin(115200);
-	Bluetooth.begin("LittleTealeaf/CSC-375-Final");
+void setup() {
+  Serial.begin(115200);
+  Bluetooth.begin("LittleTealeaf/CSC-375-Final");
 }
 
-void loop(){
-}
+void loop() {
 
+  if (Bluetooth.available()) {
+    String message = Bluetooth.readStringUntil('\n');
+  }
+}
