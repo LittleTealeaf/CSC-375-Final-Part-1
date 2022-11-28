@@ -1,7 +1,13 @@
 #include <WiFi.h>
 
+const char* ssid = "takwashnak-server";
+const char* password = "mypassword";
+
+
+
 void setup() {
   // put your setup code here, to run once:
+  WiFi.softAP(ssid,password);
 
 }
 
