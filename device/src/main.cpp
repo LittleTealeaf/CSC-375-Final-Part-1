@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <BluetoothSerial.h>
+#include <WiFi.h>
 
 BluetoothSerial Bluetooth;
 
