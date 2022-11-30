@@ -6,55 +6,64 @@
 BluetoothSerial Bluetooth;
 
 struct Packet {
-	String type;
-	String content;
+  String type;
+  String content;
+  bool error;
 };
 
 Packet convertStringtoPacket(String string) {
-  Packet message;
+  Packet packet;
+	packet.error = false;
 
   int index = string.indexOf("|");
 
-	message.type = string.substring(0,index);
-	message.content = string.substring(index + 1);
+  if (index == -1) {
+    packet.error = true;
+    return packet;
+  }
 
+  packet.type = string.substring(0, index);
+  packet.content = string.substring(index + 1);
 
-  return message;
+  return packet;
 }
 
 void handleConnectPacket(Packet packet) {
-
+  Serial.println("Handling Connect Packet");
+  Serial.println(packet.content);
 }
 
 void handleQueryPacket(Packet packet) {
-
+  Serial.println("Handling Query Packet");
+  Serial.println(packet.content);
 }
 
 void handlePacket(Packet packet) {
-	if(packet.type.equals("connect")) {
-		return handleConnectPacket(packet);
-	}
-	if(packet.type.equals("query")) {
-		return handleQueryPacket(packet);
-	}
+  if (packet.type.equals("connect")) {
+    return handleConnectPacket(packet);
+  }
+  if (packet.type.equals("query")) {
+    return handleQueryPacket(packet);
+  }
 }
 
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
 
-	// Why is this not working?
+  // Why is this not working?
   while (!Serial)
     ;
-
 }
 
 void loop() {
-	if(Serial.available()) {
-		String message = Serial.readStringUntil('\n');
+  if (Serial.available()) {
+    String message = Serial.readStringUntil('\n');
 
-		Packet packet = convertStringtoPacket(message);
+    Packet packet = convertStringtoPacket(message);
 
-		handlePacket(packet);
-	}
+    if (!packet.error) {
+      handlePacket(packet);
+    }
+  }
 }
