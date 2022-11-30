@@ -2,27 +2,68 @@
 #include <BluetoothSerial.h>
 #include <WiFi.h>
 #include <stdlib.h>
+#include <string.h>
+#include <Ticker.h>
 
 BluetoothSerial Bluetooth;
-
-#define SERIAL_CONNECTION Serial
 
 #define DELIMINER "|"
 #define PACKET_TERMINATOR '\n'
 
+int wifiStatus;
+Ticker wifiStatusTicker;
+
+// Sends a packet, as long as the serial connection is valid
+void sendPacket(const char topic[], char *content) {
+  if (Bluetooth.connected()) {
+    Bluetooth.printf("%s%s%s", topic, DELIMINER, content);
+  }
+}
+
+void sendWiFiStatusPacket() {
+  int status = WiFi.status();
+  char *content = (char *) std::to_string(status).c_str();
+  sendPacket("WIFI/STATUS", content);
+}
+
+//Checks wifi status, and if it changes, sends an updated status packet
+void checkWiFiStatus() {
+  int status = WiFi.status();
+  if (status != wifiStatus) {
+		wifiStatus = status;
+    sendWiFiStatusPacket();
+  }
+}
+
+void handlePacket(String packet) {
+  // Finds the packet topic
+  int index_topic = packet.indexOf(DELIMINER);
+  String topic = index_topic == -1 ? packet : packet.substring(0, index_topic);
+	String content = index_topic == -1 ? "" : packet.substring(index_topic + 1);
+
+  if (topic.equals("WIFI/QUERY")) {
+    return sendWiFiStatusPacket();
+  }
+
+	if(topic.equals("WIFI/CONNECT")) {
+		int index_credentials = content.indexOf(',');
+		String ssid = content.substring(0,index_credentials);
+		String password = content.substring(index_credentials + 1);
+		WiFi.begin(ssid.begin(),password.begin());
+	}
+}
+
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
-	WiFi.mode(WIFI_STA);
-	WiFi.disconnect();
+  WiFi.mode(WIFI_STA);
+  WiFi.disconnect();
 
-  // Why is this not working?
-  while (!Serial);
+	wifiStatusTicker.attach_ms(5000,checkWiFiStatus);
 }
 
-
 void loop() {
-	if(SERIAL_CONNECTION.available()) {
-		String packet = SERIAL_CONNECTION.readStringUntil(PACKET_TERMINATOR);
-	}	
+  if (Bluetooth.available()) {
+    String packet = Bluetooth.readStringUntil(PACKET_TERMINATOR);
+  }
 }
