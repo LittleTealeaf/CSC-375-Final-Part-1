@@ -22,6 +22,23 @@ Packet convertStringtoPacket(String string) {
   return message;
 }
 
+void handleConnectPacket(Packet packet) {
+
+}
+
+void handleQueryPacket(Packet packet) {
+
+}
+
+void handlePacket(Packet packet) {
+	if(packet.type.equals("connect")) {
+		return handleConnectPacket(packet);
+	}
+	if(packet.type.equals("query")) {
+		return handleQueryPacket(packet);
+	}
+}
+
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
@@ -37,5 +54,7 @@ void loop() {
 		String message = Bluetooth.readStringUntil('\n');
 
 		Packet packet = convertStringtoPacket(message);
+
+		handlePacket(packet);
 	}
 }
