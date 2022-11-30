@@ -10,7 +10,7 @@ BluetoothSerial Bluetooth;
 typedef enum PacketType {
 	PACKET_QUERY_WIFI,
 	PACKET_CONNECT,
-	PACKET_STATUS,
+	PACKET_STATUS_WIFI,
 	PACKET_ERROR
 } PacketType;
 
