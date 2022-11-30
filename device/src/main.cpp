@@ -8,6 +8,7 @@ BluetoothSerial Bluetooth;
 #define CONNECTION Serial
 
 typedef enum PacketType { QUERY_WIFI_STATUS, CONNECT_WIFI, WIFI_STATUS, ERROR } PacketType; 
+
 /*
  * Packet Structure
  *
