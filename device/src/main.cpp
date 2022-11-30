@@ -7,7 +7,7 @@ BluetoothSerial Bluetooth;
 
 #define CONNECTION Serial
 
-typedef enum PacketType { QUERY_WIFI_STATUS, CONNECT_WIFI, WIFI_STATUS } PacketType; 
+typedef enum PacketType { QUERY_WIFI_STATUS, CONNECT_WIFI, WIFI_STATUS, ERROR } PacketType; 
 /*
  * Packet Structure
  *
@@ -24,12 +24,14 @@ void sendPacket(PacketType type, String content) {
 	CONNECTION.printf("%d%s", type, content.begin());
 }
 
+// Handles a CONNECT_WIFI packet
 void handleConnect(Packet packet) {
 	int index = packet.content.indexOf('\t');
 	String uuid = packet.content.substring(0,index);
 	String password = packet.content.substring(index);
 }
 
+// Handles a QUERY_WIFI_STATUS packet
 void handleQuery(Packet packet) {
 
 }
