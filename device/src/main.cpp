@@ -7,7 +7,7 @@ BluetoothSerial Bluetooth;
 
 #define CONNECTION Serial
 
-typedef enum PacketType {
+typedef enum Topic {
 	PACKET_QUERY_WIFI,
 	PACKET_CONNECT,
 	PACKET_STATUS_WIFI,
