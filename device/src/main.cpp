@@ -7,7 +7,12 @@ BluetoothSerial Bluetooth;
 
 #define CONNECTION Serial
 
-typedef enum PacketType { QUERY_WIFI_STATUS, CONNECT_WIFI, WIFI_STATUS, ERROR } PacketType; 
+typedef enum PacketType {
+	PACKET_QUERY_WIFI,
+	PACKET_CONNECT,
+	PACKET_STATUS,
+	PACKET_ERROR
+} PacketType;
 
 /*
  * Packet Structure
@@ -30,6 +35,8 @@ void handleConnect(Packet packet) {
 	int index = packet.content.indexOf('\t');
 	String uuid = packet.content.substring(0,index);
 	String password = packet.content.substring(index);
+
+	WiFi.begin(uuid.begin(),password.begin());
 }
 
 // Handles a QUERY_WIFI_STATUS packet
@@ -38,10 +45,10 @@ void handleQuery(Packet packet) {
 }
 
 void handlePacket(Packet packet) {
-  if (packet.type == QUERY_WIFI_STATUS) {
+  if (packet.type == PACKET_QUERY_WIFI) {
     return handleQuery(packet);
   }
-  if (packet.type == CONNECT_WIFI) {
+  if (packet.type == PACKET_CONNECT) {
     return handleConnect(packet);
   }
 }
@@ -57,6 +64,8 @@ Packet createPacket(String message) {
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
+	WiFi.mode(WIFI_STA);
+	WiFi.disconnect();
 
   // Why is this not working?
   while (!Serial)
