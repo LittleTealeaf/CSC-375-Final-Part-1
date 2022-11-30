@@ -12,7 +12,7 @@ typedef enum PacketType {
 	PACKET_CONNECT,
 	PACKET_STATUS_WIFI,
 	PACKET_ERROR
-} PacketType;
+} Topic;
 
 /*
  * Packet Structure
@@ -26,7 +26,7 @@ struct Packet {
   String content;
 };
 
-void sendPacket(PacketType type, String content) {
+void sendPacket(Topic type, String content) {
 	CONNECTION.printf("%d%s", type, content.begin());
 }
 
