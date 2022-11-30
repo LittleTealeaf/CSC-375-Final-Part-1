@@ -25,19 +25,19 @@ void sendPacket(PacketType type, String content) {
 	CONNECTION.printf("%d%s", type, content.begin());
 }
 
-void sendWifiStatisPacket() {
-
-}
-
 void handleConnect(Packet packet) {
 	int index = packet.content.indexOf('\t');
 	String uuid = packet.content.substring(0,index);
 	String password = packet.content.substring(index);
 }
 
+void handleQuery(Packet packet) {
+
+}
+
 void handlePacket(Packet packet) {
   if (packet.type == QUERY) {
-    return sendWifiStatisPacket();
+    return handleQuery(packet);
   }
   if (packet.type == CONNECT) {
     return handleConnect(packet);
