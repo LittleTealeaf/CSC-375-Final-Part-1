@@ -50,8 +50,8 @@ void setup() {
 }
 
 void loop() {
-	if(Bluetooth.available()) {
-		String message = Bluetooth.readStringUntil('\n');
+	if(Serial.available()) {
+		String message = Serial.readStringUntil('\n');
 
 		Packet packet = convertStringtoPacket(message);
 
