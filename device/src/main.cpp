@@ -7,7 +7,7 @@ BluetoothSerial Bluetooth;
 
 #define CONNECTION Serial
 
-typedef enum PacketType { QUERY_WIFI_STATUS, CONNECT, WIFI_STATUS } PacketType; 
+typedef enum PacketType { QUERY_WIFI_STATUS, CONNECT_WIFI, WIFI_STATUS } PacketType; 
 /*
  * Packet Structure
  *
@@ -38,7 +38,7 @@ void handlePacket(Packet packet) {
   if (packet.type == QUERY_WIFI_STATUS) {
     return handleQuery(packet);
   }
-  if (packet.type == CONNECT) {
+  if (packet.type == CONNECT_WIFI) {
     return handleConnect(packet);
   }
 }
