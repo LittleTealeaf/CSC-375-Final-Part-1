@@ -5,6 +5,8 @@
 
 BluetoothSerial Bluetooth;
 
+#define SER Serial
+
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
@@ -12,9 +14,11 @@ void setup() {
 	WiFi.disconnect();
 
   // Why is this not working?
-  while (!Serial)
-    ;
+  while (!Serial);
 }
 
 void loop() {
+	if(SER.available()) {
+		String packet = SER.readStringUntil('\n');
+	}	
 }
