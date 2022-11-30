@@ -4,6 +4,11 @@
 
 BluetoothSerial Bluetooth;
 
+struct Message {
+	char *command;
+	char *content;
+};
+
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
