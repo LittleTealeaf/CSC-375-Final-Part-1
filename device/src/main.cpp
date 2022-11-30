@@ -1,9 +1,9 @@
 #include <Arduino.h>
 #include <BluetoothSerial.h>
+#include <Ticker.h>
 #include <WiFi.h>
 #include <stdlib.h>
 #include <string.h>
-#include <Ticker.h>
 
 BluetoothSerial Bluetooth;
 
@@ -22,15 +22,15 @@ void sendPacket(const char topic[], char *content) {
 
 void sendWiFiStatusPacket() {
   int status = WiFi.status();
-  char *content = (char *) std::to_string(status).c_str();
+  char *content = (char *)std::to_string(status).c_str();
   sendPacket("WIFI/STATUS", content);
 }
 
-//Checks wifi status, and if it changes, sends an updated status packet
+// Checks wifi status, and if it changes, sends an updated status packet
 void checkWiFiStatus() {
   int status = WiFi.status();
   if (status != wifiStatus) {
-		wifiStatus = status;
+    wifiStatus = status;
     sendWiFiStatusPacket();
   }
 }
@@ -39,18 +39,18 @@ void handlePacket(String packet) {
   // Finds the packet topic
   int index_topic = packet.indexOf(DELIMINER);
   String topic = index_topic == -1 ? packet : packet.substring(0, index_topic);
-	String content = index_topic == -1 ? "" : packet.substring(index_topic + 1);
+  String content = index_topic == -1 ? "" : packet.substring(index_topic + 1);
 
   if (topic.equals("WIFI/QUERY")) {
     return sendWiFiStatusPacket();
   }
 
-	if(topic.equals("WIFI/CONNECT")) {
-		int index_credentials = content.indexOf(',');
-		String ssid = content.substring(0,index_credentials);
-		String password = content.substring(index_credentials + 1);
-		WiFi.begin(ssid.begin(),password.begin());
-	}
+  if (topic.equals("WIFI/CONNECT")) {
+    int index_credentials = content.indexOf(',');
+    String ssid = content.substring(0, index_credentials);
+    String password = content.substring(index_credentials + 1);
+    WiFi.begin(ssid.begin(), password.begin());
+  }
 }
 
 void setup() {
@@ -59,7 +59,7 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-	wifiStatusTicker.attach_ms(5000,checkWiFiStatus);
+  wifiStatusTicker.attach_ms(5000, checkWiFiStatus);
 }
 
 void loop() {
