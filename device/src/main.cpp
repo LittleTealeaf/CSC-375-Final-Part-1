@@ -5,7 +5,9 @@
 
 BluetoothSerial Bluetooth;
 
-typedef enum PacketType { QUERY, CONNECT } PacketType;
+#define CONNECTION Serial
+
+typedef enum PacketType { QUERY, CONNECT, WIFI_STATUS } PacketType; 
 
 /*
  * Packet Structure
@@ -19,17 +21,23 @@ struct Packet {
   String content;
 };
 
+void sendPacket(PacketType type, String content) {
+	CONNECTION.printf("%d%s", type, content.begin());
+}
+
+void sendWifiStatisPacket() {
+
+}
+
 void handleConnect(Packet packet) {
 	int index = packet.content.indexOf('\t');
 	String uuid = packet.content.substring(0,index);
 	String password = packet.content.substring(index);
 }
 
-void handleQuery(Packet packet) {}
-
 void handlePacket(Packet packet) {
   if (packet.type == QUERY) {
-    return handleQuery(packet);
+    return sendWifiStatisPacket();
   }
   if (packet.type == CONNECT) {
     return handleConnect(packet);
@@ -54,8 +62,8 @@ void setup() {
 }
 
 void loop() {
-  if (Serial.available()) {
-    String message = Serial.readStringUntil('\n');
+  if (CONNECTION.available()) {
+    String message = CONNECTION.readStringUntil('\n');
 
     Packet packet = createPacket(message);
   }
