@@ -7,6 +7,9 @@ BluetoothSerial Bluetooth;
 
 #define SERIAL_CONNECTION Serial
 
+#define DELIMINER "|"
+#define PACKET_TERMINATOR '\n'
+
 void setup() {
   Serial.begin(115200);
   Bluetooth.begin("LittleTealeaf/CSC-375-Final");
@@ -17,8 +20,9 @@ void setup() {
   while (!Serial);
 }
 
+
 void loop() {
 	if(SERIAL_CONNECTION.available()) {
-		String packet = SERIAL_CONNECTION.readStringUntil('\n');
+		String packet = SERIAL_CONNECTION.readStringUntil(PACKET_TERMINATOR);
 	}	
 }
