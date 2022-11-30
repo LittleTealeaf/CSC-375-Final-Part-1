@@ -10,7 +10,7 @@ struct Packet {
 	String message;
 };
 
-Packet convertStringtoMessage(String string) {
+Packet convertStringtoPacket(String string) {
   Packet message;
 
   int index = string.indexOf("|");
