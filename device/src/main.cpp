@@ -16,7 +16,6 @@ void setup() {
 }
 
 void loop() {
-
   if (Bluetooth.available()) {
     String message = Bluetooth.readStringUntil('\n');
   }
