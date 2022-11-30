@@ -5,13 +5,13 @@
 
 BluetoothSerial Bluetooth;
 
-struct Message {
+struct Packet {
 	String type;
 	String message;
 };
 
-Message convertStringtoMessage(String string) {
-  Message message;
+Packet convertStringtoMessage(String string) {
+  Packet message;
 
   int index = string.indexOf("|");
 
@@ -33,4 +33,7 @@ void setup() {
 }
 
 void loop() {
+	if(Bluetooth.available()) {
+		String message = Bluetooth.readStringUntil('\n');
+	}
 }
