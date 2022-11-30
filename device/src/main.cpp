@@ -5,7 +5,7 @@
 
 BluetoothSerial Bluetooth;
 
-#define SER Serial
+#define SERIAL_CONNECTION Serial
 
 void setup() {
   Serial.begin(115200);
@@ -18,7 +18,7 @@ void setup() {
 }
 
 void loop() {
-	if(SER.available()) {
-		String packet = SER.readStringUntil('\n');
+	if(SERIAL_CONNECTION.available()) {
+		String packet = SERIAL_CONNECTION.readStringUntil('\n');
 	}	
 }
