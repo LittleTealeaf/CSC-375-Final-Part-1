@@ -5,46 +5,43 @@
 
 BluetoothSerial Bluetooth;
 
+typedef enum PacketType { QUERY, CONNECT } PacketType;
+
+/*
+ * Packet Structure
+ *
+ * <Type><Content>
+ *
+ */
+
 struct Packet {
-  String type;
+  int type;
   String content;
-  bool error;
 };
 
-Packet convertStringtoPacket(String string) {
-  Packet packet;
-	packet.error = false;
-
-  int index = string.indexOf("|");
-
-  if (index == -1) {
-    packet.error = true;
-    return packet;
-  }
-
-  packet.type = string.substring(0, index);
-  packet.content = string.substring(index + 1);
-
-  return packet;
+void handleConnect(Packet packet) {
+	int index = packet.content.indexOf('\t');
+	String uuid = packet.content.substring(0,index);
+	String password = packet.content.substring(index);
 }
 
-void handleConnectPacket(Packet packet) {
-  Serial.println("Handling Connect Packet");
-  Serial.println(packet.content);
-}
-
-void handleQueryPacket(Packet packet) {
-  Serial.println("Handling Query Packet");
-  Serial.println(packet.content);
-}
+void handleQuery(Packet packet) {}
 
 void handlePacket(Packet packet) {
-  if (packet.type.equals("connect")) {
-    return handleConnectPacket(packet);
+  if (packet.type == QUERY) {
+    return handleQuery(packet);
   }
-  if (packet.type.equals("query")) {
-    return handleQueryPacket(packet);
+  if (packet.type == CONNECT) {
+    return handleConnect(packet);
   }
+}
+
+Packet createPacket(String message) {
+  Packet packet;
+  packet.type = message.charAt(0);
+  packet.content = message.substring(1);
+
+  return packet;
 }
 
 void setup() {
@@ -60,10 +57,6 @@ void loop() {
   if (Serial.available()) {
     String message = Serial.readStringUntil('\n');
 
-    Packet packet = convertStringtoPacket(message);
-
-    if (!packet.error) {
-      handlePacket(packet);
-    }
+    Packet packet = createPacket(message);
   }
 }
