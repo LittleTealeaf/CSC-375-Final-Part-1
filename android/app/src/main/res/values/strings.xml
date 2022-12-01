@@ -3,4 +3,11 @@
     <string name="refresh">Refresh</string>
     <string name="ph_device_name">DEVICE NAME</string>
     <string name="ph_device_mac">DEVICE MAC ADDRESS</string>
+    <string name="hint_wifi">WiFi SSID</string>
+    <string name="hint_password">WiFi Password</string>
+    <string name="button_connect">Configure</string>
+    <string name="status">Status:</string>
+    <string name="connected">Status: Connected</string>
+    <string name="disconnected">Status: Failed to Connect</string>
+    <string name="connecting">Status: Connecting…</string>
 </resources>

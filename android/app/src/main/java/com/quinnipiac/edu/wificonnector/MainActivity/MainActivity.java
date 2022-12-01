@@ -27,13 +27,21 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "MainActivity";
     public static final String KEY_MAC = "MAC";
-
+    private static final String TAG = "MainActivity";
+    private final ActivityResultLauncher<String> requestPermissionLauncher;
+    private final ActivityResultLauncher<Intent> deviceLauncher;
     private DeviceAdapter adapter;
     private BluetoothAdapter bluetoothAdapter;
-    private ActivityResultLauncher<Intent> deviceLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onDeviceActivityFeedback);
 
+    {
+        requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
+            if (isGranted) {
+                loadDevices();
+            }
+        });
+        deviceLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), this::onDeviceActivityFeedback);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,31 +57,32 @@ public class MainActivity extends AppCompatActivity {
 
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
         bluetoothAdapter = bluetoothManager.getAdapter();
-        if (bluetoothAdapter == null) {
-            // Device doesn't support Bluetooth
-        }
 
+
+        requestAllPermissions();
         loadDevices();
-    }    private final ActivityResultLauncher<String> requestPermissionLauncher = registerForActivityResult(new ActivityResultContracts.RequestPermission(), isGranted -> {
-        if (isGranted) {
-            loadDevices();
+    }
+
+    public void requestAllPermissions() {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
         }
-    });
+        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN);
+        }
+    }
 
     public void onDeviceClick(AdapterView<?> adapterView, View view, int index, long id) {
         Intent intent = new Intent(this, DeviceActivity.class);
         BluetoothDevice device = (BluetoothDevice) adapter.getItem(index);
-        intent.putExtra(KEY_MAC,device.getAddress());
+        intent.putExtra(KEY_MAC, device.getAddress());
         deviceLauncher.launch(intent);
     }
 
     public void loadDevices() {
         Log.d(TAG, "loadDevices: Loading Devices");
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "loadDevices: No Permission");
-
             requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
-
             return;
         }
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
@@ -85,6 +94,4 @@ public class MainActivity extends AppCompatActivity {
     public void onDeviceActivityFeedback(ActivityResult result) {
 
     }
-
-
 }
