@@ -8,7 +8,7 @@ android {
 
     defaultConfig {
         applicationId "com.quinnipiac.edu.wificonnector"
-        minSdk 30
+        minSdk 32
         targetSdk 32
         versionCode 1
         versionName "1.0"
