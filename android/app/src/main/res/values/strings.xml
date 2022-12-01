@@ -6,8 +6,9 @@
     <string name="hint_wifi">WiFi SSID</string>
     <string name="hint_password">WiFi Password</string>
     <string name="button_connect">Configure</string>
-    <string name="status">Status:</string>
-    <string name="connected">Status: Connected</string>
-    <string name="disconnected">Status: Failed to Connect</string>
-    <string name="connecting">Status: Connecting…</string>
+    <string name="connected">Connected</string>
+    <string name="disconnected">Failed to Connect</string>
+    <string name="connecting">Connecting…</string>
+    <string name="unknown_device">Unknown Device</string>
+    <string name="mac_default">00:00:00:00</string>
 </resources>

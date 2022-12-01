@@ -9,10 +9,28 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
-            android:padding="3dp"
-            android:id="@+id/device_text_status"
-            android:text="@string/connecting"/>
+            android:layout_gravity="center_horizontal"
+            android:text="@string/unknown_device"
+            android:textSize="25sp"
+            android:textStyle="bold"
+            android:id="@+id/device_name" />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:textSize="20sp"
+            android:id="@+id/device_mac"
+            android:text="@string/mac_default" />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/connecting"
+            android:textSize="15sp"
+            android:id="@+id/device_connect_status" />
+
 
     <EditText
             android:layout_width="match_parent"

@@ -27,7 +27,7 @@ import java.util.Set;
 
 public class MainActivity extends AppCompatActivity {
 
-    public static final String KEY_MAC = "MAC";
+    public static final String KEY_MAC = "MAC", KEY_NAME = "DEVICE_NAME";
     private static final String TAG = "MainActivity";
     private final ActivityResultLauncher<String> requestPermissionLauncher;
     private final ActivityResultLauncher<Intent> deviceLauncher;
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
         BluetoothManager bluetoothManager = getSystemService(BluetoothManager.class);
         bluetoothAdapter = bluetoothManager.getAdapter();
 
-
         requestAllPermissions();
         loadDevices();
     }
@@ -67,15 +66,20 @@ public class MainActivity extends AppCompatActivity {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
         }
-        if(ActivityCompat.checkSelfPermission(this,Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN);
         }
     }
 
     public void onDeviceClick(AdapterView<?> adapterView, View view, int index, long id) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_CONNECT);
+            return;
+        }
         Intent intent = new Intent(this, DeviceActivity.class);
         BluetoothDevice device = (BluetoothDevice) adapter.getItem(index);
         intent.putExtra(KEY_MAC, device.getAddress());
+        intent.putExtra(KEY_NAME, device.getName());
         deviceLauncher.launch(intent);
     }
 

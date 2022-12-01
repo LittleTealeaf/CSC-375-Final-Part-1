@@ -19,9 +19,11 @@ public class DeviceActivity extends AppCompatActivity {
     private static final String TAG = "DeviceActivity";
 
     private BluetoothManager bluetoothManager;
+    private String name;
     private String mac;
 
-    private TextView textStatus;
+    private TextView textDeviceName, textDeviceMac, textConnectStatus;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -30,9 +32,17 @@ public class DeviceActivity extends AppCompatActivity {
 
         bluetoothManager = BluetoothManager.getInstance();
 
-        textStatus = findViewById(R.id.device_text_status);
+        textDeviceName = findViewById(R.id.device_name);
+        textDeviceMac = findViewById(R.id.device_mac);
+        textConnectStatus = findViewById(R.id.device_connect_status);
 
-        connectDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
+        mac = getIntent().getStringExtra(MainActivity.KEY_MAC);
+        name = getIntent().getStringExtra(MainActivity.KEY_NAME);
+
+        textDeviceName.setText(name);
+        textDeviceMac.setText(mac);
+
+        connectDevice(mac);
     }
 
     private void connectDevice(String mac) {
@@ -40,7 +50,7 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void onConnected(BluetoothSerialDevice device) {
-        textStatus.setText(R.string.connected);
+        textConnectStatus.setText(R.string.connected);
     }
 
     private void onMessageSend(String message) {
@@ -52,7 +62,7 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void onError(Throwable error) {
-        textStatus.setText(R.string.disconnected);
+        textConnectStatus.setText(R.string.disconnected);
     }
 
     @Override
