@@ -25,7 +25,7 @@ void recievePacket(String packet) {
 	String topic = packet.substring(0, sep_index);
 	String content = packet.substring(sep_index + 1);
 	
-	if(topic.equals("DEVICE/COMPATIBLE")) {
+	if(topic.equals("DEVICE/QUERY_VERSION")) {
 		sendPacket("DEVICE/VERSION",VERSION);
 	}
 }
