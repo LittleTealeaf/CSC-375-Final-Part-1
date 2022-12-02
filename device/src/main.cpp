@@ -13,7 +13,6 @@ const char *NO_CONTENT = "";
 
 BluetoothSerial Bluetooth;
 
-
 void sendPacket(const char* topic, char *content) {
 	if(Bluetooth.connected()) {
 		Bluetooth.printf("%s%s%s\n", topic, SEP, content);
@@ -21,11 +20,16 @@ void sendPacket(const char* topic, char *content) {
 }
 
 void recievePacket(String packet) {
+	int sep_index = packet.indexOf(SEP);
+	String topic = packet.substring(0, sep_index);
+	String content = packet.substring(sep_index + 1);
+	
+	if(topic.equals("DEVICE/COMPATIBLE")) {
 
+	}
 }
 
 void updateWiFi() {
-
 }
 
 void setup() {
