@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -159,16 +160,12 @@ public class DeviceActivity extends AppCompatActivity {
 
     private void onPacketSuccess(String topic) {
         Log.d(TAG, "onPacketSuccess: " + topic);
-        outstandingPackets.addAll(outstandingPackets
-                                          .stream()
-                                          .filter(packet -> packet.getTopic().equals(topic))
-                                          .map(packet -> packet.sendChildPackets(deviceInterface))
-                                          .reduce(new ArrayList<Packet>(), (
-                                                  (packets, packets2) -> {
-                                                      packets.addAll(packets2);
-                                                      return packets;
-                                                  }
-                                          )));
+        Set<Packet> children = new HashSet<>();
+        outstandingPackets.removeAll(outstandingPackets.stream().filter(packet -> packet.getTopic().equals(topic)).map((packet) -> {
+            children.addAll(packet.sendChildPackets(deviceInterface));
+            return packet;
+        }).collect(Collectors.toSet()));
+        outstandingPackets.addAll(children);
     }
 
     private void onDeviceVersion(int version) {
