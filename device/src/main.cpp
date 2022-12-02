@@ -20,13 +20,21 @@ void sendPacket(const char* topic, char *content) {
 	}
 }
 
+void sendWiFiStatus() {
+	int status = WiFi.status();
+	char *content = (char *) std::to_string(status).c_str();
+	sendPacket("WIFI/STATUS", content);
+}
+
 void recievePacket(String packet) {
 	int sep_index = packet.indexOf(SEP);
 	String topic = packet.substring(0, sep_index);
 	String content = packet.substring(sep_index + 1);
 	
-	if(topic.equals("DEVICE/QUERY_VERSION")) {
+	if(topic.equals("DEVICE/GET_VERSION")) {
 		sendPacket("DEVICE/VERSION",VERSION);
+	} else if(topic.equals("WIFI/GET_STATUS")) {
+		sendWiFiStatus();	
 	}
 }
 
