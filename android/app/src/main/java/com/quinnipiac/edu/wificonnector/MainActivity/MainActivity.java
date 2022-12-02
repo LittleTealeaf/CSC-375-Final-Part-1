@@ -104,12 +104,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void loadDevices() {
-        adapter.clearItems();
+
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN);
             return;
         }
+        bluetoothAdapter.cancelDiscovery();
+        adapter.clearItems();
         if (bluetoothAdapter.startDiscovery()) {
             Log.d(TAG, "loadDevices: Starting Discovery");
         } else {
