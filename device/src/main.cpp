@@ -39,6 +39,8 @@ void recievePacket(String packet) {
 	if(Serial) {
 		Serial.println(packet.begin());
 	}
+
+	sendPacket("PACKET/RECIEVED", topic.begin());
 	
 	if(topic.equals("DEVICE/GET_VERSION")) {
 		sendPacket("DEVICE/VERSION",VERSION);
