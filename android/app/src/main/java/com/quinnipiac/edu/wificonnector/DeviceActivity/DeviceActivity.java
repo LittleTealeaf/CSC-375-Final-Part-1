@@ -46,6 +46,7 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private SimpleBluetoothDeviceInterface deviceInterface;
+    private BluetoothManager bluetoothManager;
 
     @SuppressLint("CheckResult")
     @Override
@@ -57,7 +58,13 @@ public class DeviceActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.text_device_mac)).setText(getIntent().getStringExtra(MainActivity.KEY_MAC));
 
 
-        BluetoothManager bluetoothManager = BluetoothManager.getInstance();
+        bluetoothManager = BluetoothManager.getInstance();
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    protected void onResume() {
+        super.onResume();
         bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(Schedulers.io()).observeOn(
                 AndroidSchedulers.mainThread()).subscribe(this::onConnected, this::onConnectionError);
     }
@@ -148,5 +155,11 @@ public class DeviceActivity extends AppCompatActivity {
         sendPacket("WIFI/SET_SSID",ssid);
         sendPacket("WIFI/SET_PASSWORD",password);
         sendPacket("WIFI/DO_CONNECT");
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bluetoothManager.closeDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
     }
 }
