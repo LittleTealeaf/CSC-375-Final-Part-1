@@ -34,6 +34,9 @@ void sendWiFiStatusPacket() {
 void checkWiFiStatus() {
   int status = WiFi.status();
   if (status != wifiStatus) {
+		if(Serial) {
+			Serial.printf("WiFi Connection Update: %d\n", status);
+		}
     wifiStatus = status;
     sendWiFiStatusPacket();
   }
