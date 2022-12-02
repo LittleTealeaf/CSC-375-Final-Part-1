@@ -3,6 +3,7 @@ package com.quinnipiac.edu.wificonnector.DeviceActivity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.TextView;
 
 import androidx.annotation.LongDef;
 import androidx.annotation.Nullable;
@@ -52,6 +53,8 @@ public class DeviceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
 
+        ((TextView) findViewById(R.id.text_device_name)).setText(getIntent().getStringExtra(MainActivity.KEY_NAME));
+        ((TextView) findViewById(R.id.text_device_mac)).setText(getIntent().getStringExtra(MainActivity.KEY_MAC));
 
 
         BluetoothManager bluetoothManager = BluetoothManager.getInstance();

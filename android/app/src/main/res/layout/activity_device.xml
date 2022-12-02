@@ -14,4 +14,12 @@
             android:textSize="27sp"
             android:textStyle="bold"
             android:text="@string/unknown_device" />
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:id="@+id/text_device_mac"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:text="@string/mac_default" />
 </LinearLayout>
