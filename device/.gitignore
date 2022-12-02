@@ -4,3 +4,4 @@
 .ccls
 .ccls-cache/
 tags
+compile_commands.json
