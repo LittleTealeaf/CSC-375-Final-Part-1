@@ -6,7 +6,6 @@ import android.util.Log;
 import android.widget.EditText;
 import android.widget.TextView;
 
-import androidx.annotation.LongDef;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -16,6 +15,7 @@ import com.harrysoft.androidbluetoothserial.SimpleBluetoothDeviceInterface;
 import com.quinnipiac.edu.wificonnector.MainActivity.MainActivity;
 import com.quinnipiac.edu.wificonnector.R;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -26,7 +26,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class DeviceActivity extends AppCompatActivity {
 
-    // TODO add "ordered" messages, which the device automatically will respond a PACKET/RECEIVED message indicating "hey, I got this message" (the content is the topic)
+    // TODO add "ordered" messages, which the device automatically will respond a PACKET/RECEIVED message indicating "hey, I got this message" (the content is the topic)jjkj
 
     private static final String TAG = "DeviceActivity";
     private static final Set<Integer> COMPATIBLE_VERSIONS;
@@ -48,6 +48,8 @@ public class DeviceActivity extends AppCompatActivity {
         }};
     }
 
+    private final Set<Packet> outstandingPackets = new HashSet<>();
+
     private SimpleBluetoothDeviceInterface deviceInterface;
     private BluetoothManager bluetoothManager;
 
@@ -67,23 +69,47 @@ public class DeviceActivity extends AppCompatActivity {
 
         findViewById(R.id.button_join_wifi).setOnClickListener((view) -> connectDeviceToWifi(inputSSID.getText().toString(), inputPassword.getText().toString()));
 
-
         bluetoothManager = BluetoothManager.getInstance();
+    }
+
+    private void connectDeviceToWifi(String ssid, String password) {
+//        sendPacket(new Packet("WIFI/SET_SSID", ssid).addChild(new Packet("WIFI/SET_PASSWORD", password).addChild("WIFI/DO_CONNECT")));
+        sendPackerQueue(new Packet[]{
+                new Packet("WIFI/SET_SSID", ssid), new Packet("WIFI/SET_PASSWORD", password), new Packet("WIFI/DO_CONNECT")
+        });
+    }
+
+    public void sendPackerQueue(Packet[] packets) {
+        for (int i = 0; i < packets.length - 1; i++) {
+            packets[i].addChild(packets[i + 1]);
+        }
+        sendPacket(packets[0]);
+    }
+
+    public void sendPacket(Packet packet) {
+        outstandingPackets.add(packet.send(deviceInterface));
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bluetoothManager.closeDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
     }
 
     @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
         super.onResume();
-        bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(Schedulers.io()).observeOn(
-                AndroidSchedulers.mainThread()).subscribe(this::onConnected, this::onConnectionError);
+        bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
+                this::onConnected, this::onConnectionError);
     }
 
     private void onConnected(BluetoothSerialDevice device) {
         Log.d(TAG, "onConnected: " + device.getMac());
         deviceInterface = device.toSimpleDeviceInterface();
         deviceInterface.setListeners(this::onMessageReceived, this::onMessageSend, this::onCommunicationError);
-        sendPacket("DEVICE/GET_VERSION");
+//        sendPacket("DEVICE/GET_VERSION");
+        sendPacket(new Packet("DEVICE/GET_VERSION"));
     }
 
     private void onConnectionError(Throwable throwable) {
@@ -91,11 +117,10 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void onMessageReceived(String message) {
-        Log.d(TAG, "onMessageReceived: " + message);
         int index = message.indexOf(':');
-        String topic = message.substring(0,index);
-        String content = message.substring(index+1);
-        handlePacket(topic,content);
+        String topic = message.substring(0, index);
+        String content = message.substring(index + 1);
+        handlePacket(topic, content);
     }
 
     private void onMessageSend(String message) {
@@ -106,16 +131,11 @@ public class DeviceActivity extends AppCompatActivity {
         Log.d(TAG, "onCommunicationError: " + throwable.toString());
     }
 
-    private void sendPacket(String topic) {
-        sendPacket(topic, "");
-    }
-
-    private void sendPacket(String topic, String content) {
-        deviceInterface.sendMessage(topic + ":" + content + "\n");
-    }
-
     private void handlePacket(String topic, String content) {
-        switch(topic) {
+        switch (topic) {
+            case "PACKET/SUCCESS":
+                onPacketSuccess(content);
+                break;
             case "DEVICE/VERSION":
                 onDeviceVersion(Integer.parseInt(content));
                 break;
@@ -131,22 +151,44 @@ public class DeviceActivity extends AppCompatActivity {
             case "WIFI/PASSWORD":
                 onWifiPassword(content);
                 break;
+            case "WIFI/LOCAL_IP":
+                onWifiLocalIP(content);
+                break;
             default:
-                Log.d(TAG, "handlePacket: Unknown Message Received");
+                Log.d(TAG, "handlePacket: Unknown Message " + content);
         }
+    }
+
+    private void onPacketSuccess(String topic) {
+        Log.d(TAG, "onPacketSuccess: " + topic);
+        outstandingPackets.addAll(outstandingPackets
+                                          .stream()
+                                          .filter(packet -> packet.getTopic().equals(topic))
+                                          .map(packet -> packet.sendChildPackets(deviceInterface))
+                                          .reduce(new ArrayList<Packet>(), (
+                                                  (packets, packets2) -> {
+                                                      packets.addAll(packets2);
+                                                      return packets;
+                                                  }
+                                          )));
     }
 
     private void onDeviceVersion(int version) {
         if (COMPATIBLE_VERSIONS.contains(version)) {
             Log.d(TAG, "onDeviceVersion: Device is Compatible");
-            sendPacket("WIFI/GET_STATUS");
-            sendPacket("WIFI/GET_SSID");
-            sendPacket("WIFI/GET_PASSWORD");
+            sendPacket(new Packet("WIFI/GET_STATUS"));
+            sendPacket(new Packet("WIFI/GET_SSID"));
+            sendPacket(new Packet("WIFI/GET_PASSWORD"));
         }
     }
 
     private void onUpdateWiFiStatus(int status) {
         Log.d(TAG, "onUpdateWiFiStatus: " + WIFI_STATUS_MAP.get(status));
+        if (status == 3) {
+            sendPacket(new Packet("WIFI/GET_LOCAL_IP"));
+        } else {
+//          set local ip to be null
+        }
     }
 
     private void onWifiError(String error) {
@@ -163,15 +205,15 @@ public class DeviceActivity extends AppCompatActivity {
         inputPassword.setText(password);
     }
 
-    private void connectDeviceToWifi(String ssid, String password) {
-        sendPacket("WIFI/SET_SSID",ssid);
-        sendPacket("WIFI/SET_PASSWORD",password);
-        sendPacket("WIFI/DO_CONNECT");
+    public void onWifiLocalIP(String ip) {
+        Log.d(TAG, "onWifiLocalIP: " + ip);
     }
 
-    @Override
-    protected void onPause() {
-        super.onPause();
-        bluetoothManager.closeDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
+    public void sendPacket(String topic) {
+        sendPacket(new Packet(topic));
+    }
+
+    public void sendPacket(String topic, String content) {
+        sendPacket(new Packet(topic, content));
     }
 }
