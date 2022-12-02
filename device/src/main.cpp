@@ -70,7 +70,7 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-  wifiStatusTicker.attach_ms(5000, checkWiFiStatus);
+  wifiStatusTicker.attach_ms(1000, checkWiFiStatus);
 }
 
 void loop() {
