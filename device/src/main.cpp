@@ -9,6 +9,7 @@
 #define SEP ":"
 #define EOL '\n'
 
+char VERSION[] = "1";
 const char *NO_CONTENT = "";
 
 BluetoothSerial Bluetooth;
@@ -25,7 +26,7 @@ void recievePacket(String packet) {
 	String content = packet.substring(sep_index + 1);
 	
 	if(topic.equals("DEVICE/COMPATIBLE")) {
-
+		sendPacket("DEVICE/VERSION",VERSION);
 	}
 }
 
