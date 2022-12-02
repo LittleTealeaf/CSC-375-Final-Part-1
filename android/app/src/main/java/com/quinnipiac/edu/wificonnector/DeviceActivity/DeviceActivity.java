@@ -198,6 +198,10 @@ public class DeviceActivity extends AppCompatActivity {
                 deviceWifiStatus.setText(R.string.wifi_disconnected);
             } else if (status == STATUS_CONNECTION_LOST) {
                 deviceWifiStatus.setText(R.string.wifi_lost);
+            } else if(status == STATUS_SCAN_COMPLETE) {
+                deviceWifiStatus.setText(R.string.wifi_scan_complete);
+            } else if(status == STATUS_CONNECTION_FAILED) {
+                deviceWifiStatus.setText(R.string.wifi_failed);
             }
         }
     }

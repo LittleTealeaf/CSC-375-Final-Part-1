@@ -16,6 +16,8 @@
     <string name="wifi_no_ssid">Wifi: SSID not found</string>
     <string name="wifi_connected">Wifi: Connected</string>
     <string name="wifi_lost">Wifi: Connection Lost</string>
+    <string name="wifi_failed">Wifi: Connection Failed</string>
     <string name="wifi_disconnected">Wifi: Disconnected</string>
     <string name="retry_connection">Retry Connection</string>
+    <string name="wifi_scan_complete">Wifi: Scan Complete</string>
 </resources>
