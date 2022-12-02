@@ -15,10 +15,7 @@ import com.harrysoft.androidbluetoothserial.SimpleBluetoothDeviceInterface;
 import com.quinnipiac.edu.wificonnector.MainActivity.MainActivity;
 import com.quinnipiac.edu.wificonnector.R;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +37,8 @@ public class DeviceActivity extends AppCompatActivity {
     private SimpleBluetoothDeviceInterface deviceInterface;
     private BluetoothManager bluetoothManager;
 
+    private TextView deviceWifiStatus, deviceBluetoothStatus, deviceLocalIP;
+
     private EditText inputSSID, inputPassword;
 
     @SuppressLint("CheckResult")
@@ -53,6 +52,9 @@ public class DeviceActivity extends AppCompatActivity {
 
         inputSSID = findViewById(R.id.input_wifi_ssid);
         inputPassword = findViewById(R.id.input_wifi_password);
+        deviceBluetoothStatus = findViewById(R.id.text_device_bluetooth);
+        deviceWifiStatus = findViewById(R.id.text_device_wifi);
+        deviceLocalIP = findViewById(R.id.text_device_ip);
 
         findViewById(R.id.button_join_wifi).setOnClickListener((view) -> connectDeviceToWifi(inputSSID.getText().toString(), inputPassword.getText().toString()));
 
@@ -88,6 +90,8 @@ public class DeviceActivity extends AppCompatActivity {
         super.onResume();
         bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
                 this::onConnected, this::onConnectionError);
+        deviceWifiStatus.setText("");
+        deviceBluetoothStatus.setText(R.string.connecting);
     }
 
     private void onConnected(BluetoothSerialDevice device) {
@@ -95,10 +99,12 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInterface = device.toSimpleDeviceInterface();
         deviceInterface.setListeners(this::onMessageReceived, this::onMessageSend, this::onCommunicationError);
         sendPacket(new Packet("DEVICE/GET_VERSION"));
+        deviceBluetoothStatus.setText(R.string.connected);
     }
 
     private void onConnectionError(Throwable throwable) {
         Log.d(TAG, "onConnectionError: " + throwable.toString());
+        deviceBluetoothStatus.setText(R.string.disconnected);
     }
 
     private void onMessageReceived(String message) {
@@ -167,9 +173,24 @@ public class DeviceActivity extends AppCompatActivity {
         Log.d(TAG, "onUpdateWiFiStatus: " + status);
         if (status == STATUS_CONNECTED) {
             sendPacket(new Packet("WIFI/GET_LOCAL_IP"));
+            deviceWifiStatus.setText(R.string.wifi_connected);
         } else {
-//          set local ip to be null
+            deviceLocalIP.setText("");
+
+            if(status == STATUS_IDLE) {
+                deviceWifiStatus.setText(R.string.wifi_idle);
+            } else if(status == STATUS_NO_SSID) {
+                deviceWifiStatus.setText(R.string.wifi_no_ssid);
+            } else if(status == STATUS_NO_SHIELD) {
+                deviceWifiStatus.setText(R.string.wifi_no_shield);
+            } else if(status == STATUS_DISCONNECTED) {
+                deviceWifiStatus.setText(R.string.wifi_disconnected);
+            } else if(status == STATUS_CONNECTION_LOST) {
+                deviceWifiStatus.setText(R.string.wifi_lost);
+            }
+
         }
+
     }
 
     private void onWifiError(String error) {
@@ -188,6 +209,7 @@ public class DeviceActivity extends AppCompatActivity {
 
     public void onWifiLocalIP(String ip) {
         Log.d(TAG, "onWifiLocalIP: " + ip);
+        deviceLocalIP.setText(ip);
     }
 
     public void sendPacket(String topic) {

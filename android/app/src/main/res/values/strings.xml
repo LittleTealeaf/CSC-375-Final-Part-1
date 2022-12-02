@@ -11,4 +11,10 @@
     <string name="connecting">Connecting…</string>
     <string name="unknown_device">Unknown Device</string>
     <string name="mac_default">00:00:00:00</string>
+    <string name="wifi_no_shield">Wifi: No Shield</string>
+    <string name="wifi_idle">WiFi: idle</string>
+    <string name="wifi_no_ssid">Wifi: SSID not found</string>
+    <string name="wifi_connected">Wifi: Connected</string>
+    <string name="wifi_lost">Wifi: Connection Lost</string>
+    <string name="wifi_disconnected">Wifi: Disconnected</string>
 </resources>
