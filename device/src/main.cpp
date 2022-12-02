@@ -10,7 +10,12 @@
 #define EOL '\n'
 
 char VERSION[] = "1";
-const char *NO_CONTENT = "";
+char NO_CONTENT[] = "";
+char NO_SSID[] = "NO_SSID";
+chat NO_PASSWORD[] = "NO_PASSWORD";
+
+char *WifiSSID;
+char *WiFiPassword;
 
 BluetoothSerial Bluetooth;
 
@@ -35,6 +40,22 @@ void recievePacket(String packet) {
 		sendPacket("DEVICE/VERSION",VERSION);
 	} else if(topic.equals("WIFI/GET_STATUS")) {
 		sendWiFiStatus();	
+	} else if(topic.equals("WIFI/SET_SSID")) {
+		WifiSSID = content.begin();
+	} else if(topic.equals("WIFI/SET_PASSWORD")) {
+		WiFiPassword = content.begin();
+	} else if(topic.equals("WIFI/GET_SSID")) {
+		sendPacket("WIFI/SSID", WifiSSID);
+	} else if(topic.equals("WIFI/GET_PASSWORD")) {
+		sendPacket("WIFI/PASSWORD", WiFiPassword);
+	} else if(topic.equals("WIFI/DO_CONNECT")) {
+		if(WifiSSID == nullptr) {
+			sendPacket("WIFI/ERROR",NO_SSID);
+		} else if(WiFiPassword == nullptr) {
+			sendPacket("WIFI/ERROR",NO_PASSWORD);
+		} else {
+			WiFi.begin(WifiSSID,WiFiPassword);
+		}
 	}
 }
 
