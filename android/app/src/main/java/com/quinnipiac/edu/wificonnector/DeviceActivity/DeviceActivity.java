@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.annotation.LongDef;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -43,7 +44,6 @@ public class DeviceActivity extends AppCompatActivity {
         }};
     }
 
-    private BluetoothManager bluetoothManager;
     private SimpleBluetoothDeviceInterface deviceInterface;
 
     @SuppressLint("CheckResult")
@@ -52,8 +52,9 @@ public class DeviceActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_device);
 
-        bluetoothManager = BluetoothManager.getInstance();
 
+
+        BluetoothManager bluetoothManager = BluetoothManager.getInstance();
         bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(Schedulers.io()).observeOn(
                 AndroidSchedulers.mainThread()).subscribe(this::onConnected, this::onConnectionError);
     }
@@ -93,8 +94,6 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInterface.sendMessage(topic + ":" + content + "\n");
     }
 
-
-
     private void handlePacket(String topic, String content) {
         switch(topic) {
             case "DEVICE/VERSION":
@@ -102,6 +101,15 @@ public class DeviceActivity extends AppCompatActivity {
                 break;
             case "WIFI/STATUS":
                 onUpdateWiFiStatus(Integer.parseInt(content));
+                break;
+            case "WIFI/ERROR":
+                onWifiError(content);
+                break;
+            case "WIFI/SSID":
+                onWifiSSID(content);
+                break;
+            case "WIFI/PASSWORD":
+                onWifiPassword(content);
                 break;
             default:
                 Log.d(TAG, "handlePacket: Unknown Message Received");
@@ -112,12 +120,30 @@ public class DeviceActivity extends AppCompatActivity {
         if (COMPATIBLE_VERSIONS.contains(version)) {
             Log.d(TAG, "onDeviceVersion: Device is Compatible");
             sendPacket("WIFI/GET_STATUS");
+            sendPacket("WIFI/GET_SSID");
+            sendPacket("WIFI/GET_PASSWORD");
         }
     }
 
     private void onUpdateWiFiStatus(int status) {
         Log.d(TAG, "onUpdateWiFiStatus: " + WIFI_STATUS_MAP.get(status));
-        
+    }
 
+    private void onWifiError(String error) {
+        Log.d(TAG, "onWifiError: " + error);
+    }
+
+    private void onWifiSSID(String ssid) {
+        Log.d(TAG, "onWifiSSID: " + ssid);
+    }
+
+    private void onWifiPassword(String password) {
+        Log.d(TAG, "onWifiPassword: " + password);
+    }
+
+    private void connectDeviceToWifi(String ssid, String password) {
+        sendPacket("WIFI/SET_SSID",ssid);
+        sendPacket("WIFI/SET_PASSWORD",password);
+        sendPacket("WIFI/DO_CONNECT");
     }
 }

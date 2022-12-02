@@ -10,56 +10,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center_horizontal"
-            android:text="@string/unknown_device"
-            android:textSize="25sp"
+            android:id="@+id/text_device_name"
+            android:textSize="27sp"
             android:textStyle="bold"
-            android:id="@+id/device_name" />
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:textSize="20sp"
-            android:id="@+id/device_mac"
-            android:text="@string/mac_default" />
-
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="@string/connecting"
-            android:textSize="15sp"
-            android:id="@+id/device_connect_status" />
-
-
-    <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_wifi"
-            android:autofillHints=""
-            android:inputType="text"
-            android:id="@+id/device_wifi_ssid" />
-
-    <EditText
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_password"
-            android:autofillHints=""
-            android:inputType="text"
-            android:id="@+id/device_wifi_password"
-            tools:ignore="TextFields" />
-
-    <Button
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/button_connect"
-            android:id="@+id/device_button_configure" />
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="17sp"
-            android:layout_gravity="center_horizontal"
-            android:id="@+id/device_wifi_status" />
+            android:text="@string/unknown_device" />
 </LinearLayout>
