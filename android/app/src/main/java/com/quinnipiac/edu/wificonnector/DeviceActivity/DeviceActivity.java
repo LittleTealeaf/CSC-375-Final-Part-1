@@ -73,7 +73,6 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void connectDeviceToWifi(String ssid, String password) {
-//        sendPacket(new Packet("WIFI/SET_SSID", ssid).addChild(new Packet("WIFI/SET_PASSWORD", password).addChild("WIFI/DO_CONNECT")));
         sendPackerQueue(new Packet[]{
                 new Packet("WIFI/SET_SSID", ssid), new Packet("WIFI/SET_PASSWORD", password), new Packet("WIFI/DO_CONNECT")
         });
@@ -108,7 +107,6 @@ public class DeviceActivity extends AppCompatActivity {
         Log.d(TAG, "onConnected: " + device.getMac());
         deviceInterface = device.toSimpleDeviceInterface();
         deviceInterface.setListeners(this::onMessageReceived, this::onMessageSend, this::onCommunicationError);
-//        sendPacket("DEVICE/GET_VERSION");
         sendPacket(new Packet("DEVICE/GET_VERSION"));
     }
 
