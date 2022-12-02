@@ -35,6 +35,10 @@ void recievePacket(String packet) {
 	int sep_index = packet.indexOf(SEP);
 	String topic = packet.substring(0, sep_index);
 	String content = packet.substring(sep_index + 1);
+
+	if(Serial) {
+		Serial.println(packet.begin());
+	}
 	
 	if(topic.equals("DEVICE/GET_VERSION")) {
 		sendPacket("DEVICE/VERSION",VERSION);
