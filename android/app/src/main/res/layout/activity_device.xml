@@ -14,12 +14,37 @@
             android:textSize="27sp"
             android:textStyle="bold"
             android:text="@string/unknown_device" />
+
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:id="@+id/text_device_mac"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:text="@string/mac_default" />
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/text_device_mac"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:text="@string/mac_default" />
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/input_wifi_ssid"
+            android:hint="@string/hint_wifi"
+            android:autofillHints=""
+            android:inputType="text" />
+
+    <EditText
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/input_wifi_password"
+            android:hint="@string/hint_password"
+            android:autofillHints=""
+            android:inputType="text"
+            tools:ignore="TextFields" />
+
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        android:text="@string/button_connect"
+        android:id="@+id/button_join_wifi"
+        />
 </LinearLayout>

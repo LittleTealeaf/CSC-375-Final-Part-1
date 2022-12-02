@@ -3,6 +3,7 @@ package com.quinnipiac.edu.wificonnector.DeviceActivity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.TextView;
 
 import androidx.annotation.LongDef;
@@ -24,6 +25,8 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class DeviceActivity extends AppCompatActivity {
+
+    // TODO add "ordered" messages, which the device automatically will respond a PACKET/RECEIVED message indicating "hey, I got this message" (the content is the topic)
 
     private static final String TAG = "DeviceActivity";
     private static final Set<Integer> COMPATIBLE_VERSIONS;
@@ -48,6 +51,8 @@ public class DeviceActivity extends AppCompatActivity {
     private SimpleBluetoothDeviceInterface deviceInterface;
     private BluetoothManager bluetoothManager;
 
+    private EditText inputSSID, inputPassword;
+
     @SuppressLint("CheckResult")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -56,6 +61,11 @@ public class DeviceActivity extends AppCompatActivity {
 
         ((TextView) findViewById(R.id.text_device_name)).setText(getIntent().getStringExtra(MainActivity.KEY_NAME));
         ((TextView) findViewById(R.id.text_device_mac)).setText(getIntent().getStringExtra(MainActivity.KEY_MAC));
+
+        inputSSID = findViewById(R.id.input_wifi_ssid);
+        inputPassword = findViewById(R.id.input_wifi_password);
+
+        findViewById(R.id.button_join_wifi).setOnClickListener((view) -> connectDeviceToWifi(inputSSID.getText().toString(), inputPassword.getText().toString()));
 
 
         bluetoothManager = BluetoothManager.getInstance();
@@ -145,10 +155,12 @@ public class DeviceActivity extends AppCompatActivity {
 
     private void onWifiSSID(String ssid) {
         Log.d(TAG, "onWifiSSID: " + ssid);
+        inputSSID.setText(ssid);
     }
 
     private void onWifiPassword(String password) {
         Log.d(TAG, "onWifiPassword: " + password);
+        inputPassword.setText(password);
     }
 
     private void connectDeviceToWifi(String ssid, String password) {
