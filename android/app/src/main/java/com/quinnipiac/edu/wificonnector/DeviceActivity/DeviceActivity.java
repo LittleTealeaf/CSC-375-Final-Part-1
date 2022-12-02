@@ -2,12 +2,15 @@ package com.quinnipiac.edu.wificonnector.DeviceActivity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
+import com.harrysoft.androidbluetoothserial.BluetoothConnectException;
 import com.harrysoft.androidbluetoothserial.BluetoothManager;
 import com.harrysoft.androidbluetoothserial.BluetoothSerialDevice;
+import com.harrysoft.androidbluetoothserial.SimpleBluetoothDeviceInterface;
 import com.quinnipiac.edu.wificonnector.MainActivity.MainActivity;
 import com.quinnipiac.edu.wificonnector.R;
 
@@ -19,10 +22,11 @@ public class DeviceActivity extends AppCompatActivity {
     private static final String TAG = "DeviceActivity";
 
     private BluetoothManager bluetoothManager;
-    private String name;
     private String mac;
 
-    private TextView textDeviceName, textDeviceMac, textConnectStatus;
+    private TextView textConnectStatus;
+
+    private SimpleBluetoothDeviceInterface deviceInterface;
 
 
     @Override
@@ -32,12 +36,12 @@ public class DeviceActivity extends AppCompatActivity {
 
         bluetoothManager = BluetoothManager.getInstance();
 
-        textDeviceName = findViewById(R.id.device_name);
-        textDeviceMac = findViewById(R.id.device_mac);
+        TextView textDeviceName = findViewById(R.id.device_name);
+        TextView textDeviceMac = findViewById(R.id.device_mac);
         textConnectStatus = findViewById(R.id.device_connect_status);
 
         mac = getIntent().getStringExtra(MainActivity.KEY_MAC);
-        name = getIntent().getStringExtra(MainActivity.KEY_NAME);
+        String name = getIntent().getStringExtra(MainActivity.KEY_NAME);
 
         textDeviceName.setText(name);
         textDeviceMac.setText(mac);
@@ -45,23 +49,38 @@ public class DeviceActivity extends AppCompatActivity {
         connectDevice(mac);
     }
 
+    @SuppressLint("CheckResult")
     private void connectDevice(String mac) {
         bluetoothManager.openSerialDevice(mac).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(this::onConnected, this::onError);
     }
 
     private void onConnected(BluetoothSerialDevice device) {
         textConnectStatus.setText(R.string.connected);
+
+        deviceInterface = device.toSimpleDeviceInterface();
+
+        deviceInterface.setListeners(this::onMessageReceived, this::onMessageSend, this::onError);
+        sendQueryPacket();
+    }
+
+    private void sendQueryPacket() {
+        sendMessage("WIFI/QUERY",null);
+    }
+
+    private void sendMessage(String topic, String content) {
+        deviceInterface.sendMessage(topic + (content == null ? "\n" : ("|" + content + "\n")));
     }
 
     private void onMessageSend(String message) {
-
+        Log.d(TAG, "onMessageSend: " + message);
     }
 
     private void onMessageReceived(String message) {
-
+        Log.d(TAG, "onMessageReceived: " + message);
     }
 
     private void onError(Throwable error) {
+        Log.d(TAG, "onError: " + error.toString());
         textConnectStatus.setText(R.string.disconnected);
     }
 
