@@ -53,5 +53,5 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="@string/button_connect"
-            android:id="@+id/device_wifi_connect" />
+            android:id="@+id/device_button_configure" />
 </LinearLayout>

@@ -24,7 +24,7 @@ public class DeviceActivity extends AppCompatActivity {
     private BluetoothManager bluetoothManager;
     private String mac;
 
-    private TextView textConnectStatus;
+    private TextView textConnectStatus, inputSSID, inputPassword;
 
     private SimpleBluetoothDeviceInterface deviceInterface;
 
@@ -38,10 +38,14 @@ public class DeviceActivity extends AppCompatActivity {
 
         TextView textDeviceName = findViewById(R.id.device_name);
         TextView textDeviceMac = findViewById(R.id.device_mac);
+        inputSSID = findViewById(R.id.device_wifi_ssid);
+        inputPassword = findViewById(R.id.device_wifi_password);
         textConnectStatus = findViewById(R.id.device_connect_status);
 
         mac = getIntent().getStringExtra(MainActivity.KEY_MAC);
         String name = getIntent().getStringExtra(MainActivity.KEY_NAME);
+
+        findViewById(R.id.device_button_configure).setOnClickListener((view) -> sendWiFiPacket());
 
         textDeviceName.setText(name);
         textDeviceMac.setText(mac);
@@ -65,6 +69,13 @@ public class DeviceActivity extends AppCompatActivity {
 
     private void sendQueryPacket() {
         sendMessage("WIFI/QUERY",null);
+    }
+
+    private void sendWiFiPacket() {
+        String ssid = inputSSID.getText().toString();
+        String password = inputPassword.getText().toString();
+
+        sendMessage("WIFI/CONNECT",ssid + "," + password);
     }
 
     private void sendMessage(String topic, String content) {
