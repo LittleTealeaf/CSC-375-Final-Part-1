@@ -41,7 +41,7 @@ void recievePacket(String packet) {
     Serial.println(packet.begin());
   }
 
-  sendPacket("PACKET/RECIEVED", topic.begin());
+  sendPacket("PACKET/RECEIVED", topic.begin());
 
   if (topic.equals("DEVICE/GET_VERSION")) {
     sendPacket("DEVICE/VERSION", VERSION);
@@ -71,7 +71,9 @@ void recievePacket(String packet) {
     } else {
       WiFi.begin(WifiSSID, WifiPassword);
     }
-  }
+  } else if(topic.equals("WIFI/GET_LOCAL_IP")) {
+		sendPacket("WIFI/LOCAL_IP", WiFi.localIP().toString().begin());
+	}
 }
 
 void updateWiFi() {
