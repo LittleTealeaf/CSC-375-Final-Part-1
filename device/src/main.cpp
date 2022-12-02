@@ -91,6 +91,7 @@ void handlePacket(String packet) {
     String ssid = content.substring(0, index_credentials);
     String password = content.substring(index_credentials + 1);
     WiFi.begin(ssid.begin(), password.begin());
+		return;
   }
 }
 
