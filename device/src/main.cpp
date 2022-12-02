@@ -41,7 +41,7 @@ void sendPacket(const char topic[], char *content) {
 
 void sendWiFiStatusPacket() {
   int status = WiFi.status();
-  char *content = (char *)std::to_string(status).c_str();
+  char *content = (char *) std::to_string(status).c_str();
   sendPacket("WIFI/STATUS", content);
 }
 
