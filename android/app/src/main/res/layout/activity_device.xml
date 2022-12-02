@@ -23,6 +23,7 @@
             android:id="@+id/device_mac"
             android:text="@string/mac_default" />
 
+
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -54,4 +55,11 @@
             android:layout_height="wrap_content"
             android:text="@string/button_connect"
             android:id="@+id/device_button_configure" />
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:layout_gravity="center_horizontal"
+            android:id="@+id/device_wifi_status" />
 </LinearLayout>

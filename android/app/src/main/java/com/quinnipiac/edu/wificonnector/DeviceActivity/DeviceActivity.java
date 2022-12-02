@@ -7,24 +7,41 @@ import android.os.Bundle;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.harrysoft.androidbluetoothserial.BluetoothConnectException;
 import com.harrysoft.androidbluetoothserial.BluetoothManager;
 import com.harrysoft.androidbluetoothserial.BluetoothSerialDevice;
 import com.harrysoft.androidbluetoothserial.SimpleBluetoothDeviceInterface;
 import com.quinnipiac.edu.wificonnector.MainActivity.MainActivity;
 import com.quinnipiac.edu.wificonnector.R;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 public class DeviceActivity extends AppCompatActivity {
+
+    private static final Map<Integer, String> WIFI_STATUS_MAP;
+
+    static {
+        WIFI_STATUS_MAP = new HashMap<Integer,String>() {{
+            put(255,"No Shield");
+            put(0,"Idle");
+            put(1,"No SSID Available");
+            put(2,"Scan Complete");
+            put(3,"Connected");
+            put(4,"Connection Failed");
+            put(5,"Connection Lost");
+            put(6,"Disconnected");
+        }};
+    }
 
     private static final String TAG = "DeviceActivity";
 
     private BluetoothManager bluetoothManager;
     private String mac;
 
-    private TextView textConnectStatus, inputSSID, inputPassword;
+    private TextView textConnectStatus, inputSSID, inputPassword, wifiStatus;
 
     private SimpleBluetoothDeviceInterface deviceInterface;
 
@@ -41,6 +58,7 @@ public class DeviceActivity extends AppCompatActivity {
         inputSSID = findViewById(R.id.device_wifi_ssid);
         inputPassword = findViewById(R.id.device_wifi_password);
         textConnectStatus = findViewById(R.id.device_connect_status);
+        wifiStatus = findViewById(R.id.device_wifi_status);
 
         mac = getIntent().getStringExtra(MainActivity.KEY_MAC);
         String name = getIntent().getStringExtra(MainActivity.KEY_NAME);
@@ -88,6 +106,20 @@ public class DeviceActivity extends AppCompatActivity {
 
     private void onMessageReceived(String message) {
         Log.d(TAG, "onMessageReceived: " + message);
+        int index = message.indexOf('|');
+        String topic = index == -1 ? message : message.substring(0,index);
+        String content = index == -1 ? null : message.substring(index + 1);
+
+        if(topic.equals("WIFI/STATUS")) {
+            if(content == null) {
+                Log.d(TAG, "onMessageReceived: Error: Content is null when it should not be null");
+                return;
+            }
+            int status_id = Integer.parseInt(content);
+            String status = "WiFi Status: " + WIFI_STATUS_MAP.get(status_id);
+            wifiStatus.setText(status);
+
+        }
     }
 
     private void onError(Throwable error) {
