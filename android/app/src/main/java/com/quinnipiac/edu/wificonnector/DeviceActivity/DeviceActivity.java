@@ -92,6 +92,7 @@ public class DeviceActivity extends AppCompatActivity {
                 this::onConnected, this::onConnectionError);
         deviceWifiStatus.setText("");
         deviceBluetoothStatus.setText(R.string.connecting);
+        setConfigurable(false);
     }
 
     private void onConnected(BluetoothSerialDevice device) {
@@ -100,6 +101,7 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInterface.setListeners(this::onMessageReceived, this::onMessageSend, this::onCommunicationError);
         sendPacket(new Packet("DEVICE/GET_VERSION"));
         deviceBluetoothStatus.setText(R.string.connected);
+        setConfigurable(true);
     }
 
     private void onConnectionError(Throwable throwable) {
@@ -207,16 +209,22 @@ public class DeviceActivity extends AppCompatActivity {
         inputPassword.setText(password);
     }
 
-    public void onWifiLocalIP(String ip) {
+    private void onWifiLocalIP(String ip) {
         Log.d(TAG, "onWifiLocalIP: " + ip);
         deviceLocalIP.setText(ip);
     }
 
-    public void sendPacket(String topic) {
+    private void sendPacket(String topic) {
         sendPacket(new Packet(topic));
     }
 
-    public void sendPacket(String topic, String content) {
+    private void sendPacket(String topic, String content) {
         sendPacket(new Packet(topic, content));
+    }
+
+    private void setConfigurable(boolean configurable) {
+        inputSSID.setEnabled(configurable);
+        inputPassword.setEnabled(configurable);
+        findViewById(R.id.button_join_wifi).setEnabled(configurable);
     }
 }
