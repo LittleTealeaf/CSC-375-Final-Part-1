@@ -45,9 +45,9 @@ void recievePacket(String packet) {
 	} else if(topic.equals("WIFI/SET_PASSWORD")) {
 		WiFiPassword = content.begin();
 	} else if(topic.equals("WIFI/GET_SSID")) {
-		sendPacket("WIFI/SSID", WifiSSID);
+		sendPacket("WIFI/SSID", WifiSSID == nullptr ? NO_CONTENT : WifiSSID);
 	} else if(topic.equals("WIFI/GET_PASSWORD")) {
-		sendPacket("WIFI/PASSWORD", WiFiPassword);
+		sendPacket("WIFI/PASSWORD", WiFiPassword == nullptr ? NO_CONTENT : WiFiPassword);
 	} else if(topic.equals("WIFI/DO_CONNECT")) {
 		if(WifiSSID == nullptr) {
 			sendPacket("WIFI/ERROR",NO_SSID);
