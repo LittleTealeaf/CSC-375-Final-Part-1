@@ -62,7 +62,7 @@ public class DeviceActivity extends AppCompatActivity {
         Log.d(TAG, "onConnected: " + device.getMac());
         deviceInterface = device.toSimpleDeviceInterface();
         deviceInterface.setListeners(this::onMessageReceived, this::onMessageSend, this::onCommunicationError);
-        sendPacket("DEVICE/QUERY_VERSION");
+        sendPacket("DEVICE/GET_VERSION");
     }
 
     private void onConnectionError(Throwable throwable) {
@@ -93,13 +93,31 @@ public class DeviceActivity extends AppCompatActivity {
         deviceInterface.sendMessage(topic + ":" + content + "\n");
     }
 
+
+
     private void handlePacket(String topic, String content) {
         switch(topic) {
             case "DEVICE/VERSION":
-                Log.d(TAG, "handlePacket: Device is on version " + content);
+                onDeviceVersion(Integer.parseInt(content));
+                break;
+            case "WIFI/STATUS":
+                onUpdateWiFiStatus(Integer.parseInt(content));
                 break;
             default:
                 Log.d(TAG, "handlePacket: Unknown Message Received");
         }
+    }
+
+    private void onDeviceVersion(int version) {
+        if (COMPATIBLE_VERSIONS.contains(version)) {
+            Log.d(TAG, "onDeviceVersion: Device is Compatible");
+            sendPacket("WIFI/GET_STATUS");
+        }
+    }
+
+    private void onUpdateWiFiStatus(int status) {
+        Log.d(TAG, "onUpdateWiFiStatus: " + WIFI_STATUS_MAP.get(status));
+        
+
     }
 }
