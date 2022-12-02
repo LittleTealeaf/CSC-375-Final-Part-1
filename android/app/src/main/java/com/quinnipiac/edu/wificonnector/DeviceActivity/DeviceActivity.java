@@ -30,24 +30,10 @@ public class DeviceActivity extends AppCompatActivity {
     // TODO add "ordered" messages, which the device automatically will respond a PACKET/RECEIVED message indicating "hey, I got this message" (the content is the topic)jjkj
 
     private static final String TAG = "DeviceActivity";
-    private static final Set<Integer> COMPATIBLE_VERSIONS;
-    private static final Map<Integer, String> WIFI_STATUS_MAP;
+    private static final int COMMUNICATION_VERSION = 1;
+    private static final int STATUS_NO_SHIELD = 255, STATUS_IDLE = 0, STATUS_NO_SSID = 1, STATUS_SCAN_COMPLETE = 2, STATUS_CONNECTED = 3, STATUS_CONNECTION_FAILED = 4,
+            STATUS_CONNECTION_LOST = 5, STATUS_DISCONNECTED = 6;
 
-    static {
-        WIFI_STATUS_MAP = new HashMap<Integer, String>() {{
-            put(255, "No Shield");
-            put(0, "Idle");
-            put(1, "No SSID Available");
-            put(2, "Scan Complete");
-            put(3, "Connected");
-            put(4, "Connection Failed");
-            put(5, "Connection Lost");
-            put(6, "Disconnected");
-        }};
-        COMPATIBLE_VERSIONS = new HashSet<Integer>() {{
-            add(1);
-        }};
-    }
 
     private final Set<Packet> outstandingPackets = new HashSet<>();
 
@@ -169,7 +155,7 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void onDeviceVersion(int version) {
-        if (COMPATIBLE_VERSIONS.contains(version)) {
+        if (version == COMMUNICATION_VERSION) {
             Log.d(TAG, "onDeviceVersion: Device is Compatible");
             sendPacket(new Packet("WIFI/GET_STATUS"));
             sendPacket(new Packet("WIFI/GET_SSID"));
@@ -178,8 +164,8 @@ public class DeviceActivity extends AppCompatActivity {
     }
 
     private void onUpdateWiFiStatus(int status) {
-        Log.d(TAG, "onUpdateWiFiStatus: " + WIFI_STATUS_MAP.get(status));
-        if (status == 3) {
+        Log.d(TAG, "onUpdateWiFiStatus: " + status);
+        if (status == STATUS_CONNECTED) {
             sendPacket(new Packet("WIFI/GET_LOCAL_IP"));
         } else {
 //          set local ip to be null
