@@ -7,6 +7,7 @@
 #include <M5Core2.h>
 
 #define SEP ":"
+#define EOL '\n'
 
 const char *NO_CONTENT = "";
 
