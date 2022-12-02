@@ -16,7 +16,11 @@ Ticker wifiStatusTicker;
 // Sends a packet, as long as the serial connection is valid
 void sendPacket(const char topic[], char *content) {
   if (Bluetooth.connected()) {
-    Bluetooth.printf("%s%s%s", topic, DELIMINER, content);
+    Bluetooth.printf("%s%s%s\n", topic, DELIMINER, content);
+    if (Serial) {
+      Serial.printf("Send Message: %s%s%s", topic, DELIMINER, content);
+      Serial.println();
+    }
   }
 }
 
@@ -36,6 +40,10 @@ void checkWiFiStatus() {
 }
 
 void handlePacket(String packet) {
+  if (Serial) {
+    Serial.printf("Received Packet: %s", packet.begin());
+    Serial.println();
+  }
   // Finds the packet topic
   int index_topic = packet.indexOf(DELIMINER);
   String topic = index_topic == -1 ? packet : packet.substring(0, index_topic);
@@ -64,6 +72,8 @@ void setup() {
 
 void loop() {
   if (Bluetooth.available()) {
+    Serial.println("Recieving Data");
     String packet = Bluetooth.readStringUntil(PACKET_TERMINATOR);
+    handlePacket(packet);
   }
 }
