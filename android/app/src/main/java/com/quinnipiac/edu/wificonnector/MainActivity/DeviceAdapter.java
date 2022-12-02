@@ -30,10 +30,23 @@ public class DeviceAdapter extends BaseAdapter {
         inflater = LayoutInflater.from(context);
     }
 
-    public void setItems(List<BluetoothDevice> devices) {
-        this.devices = devices;
+    public void clearItems() {
+        this.devices.clear();
         notifyDataSetChanged();
     }
+
+    public void addDevice(BluetoothDevice device) {
+        if (devices.stream().anyMatch(d -> d.getAddress().equals(device.getAddress()))) {
+           return;
+        }
+        this.devices.add(device);
+        notifyDataSetChanged();
+    }
+
+//    public void setItems(List<BluetoothDevice> devices) {
+//        this.devices = devices;
+//        notifyDataSetChanged();
+//    }
 
     @Override
     public int getCount() {
@@ -59,17 +72,15 @@ public class DeviceAdapter extends BaseAdapter {
         BluetoothDevice item = (BluetoothDevice) getItem(i);
 
         if (ActivityCompat.checkSelfPermission(context, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
-            // TODO: Consider calling
-            //    ActivityCompat#requestPermissions
-            // here to request the missing permissions, and then overriding
-            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
-            //                                          int[] grantResults)
-            // to handle the case where the user grants the permission. See the documentation
-            // for ActivityCompat#requestPermissions for more details.
             return view;
         }
 
-        ((TextView) view.findViewById(R.id.list_device_item_name)).setText(item.getName());
+        String name = item.getName();
+        if (name == null || name.equals("")) {
+            name = "Unknown Device";
+        }
+
+        ((TextView) view.findViewById(R.id.list_device_item_name)).setText(name);
         ((TextView) view.findViewById(R.id.list_device_item_mac)).setText(item.getAddress());
 
         return view;
