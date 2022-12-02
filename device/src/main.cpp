@@ -14,8 +14,8 @@ char NO_CONTENT[] = "";
 char NO_SSID[] = "NO_SSID";
 char NO_PASSWORD[] = "NO_PASSWORD";
 
-char *WifiSSID;
-char *WifiPassword;
+String WifiSSID = "";
+String WifiPassword = "";
 int wifiStatus;
 
 BluetoothSerial Bluetooth;
@@ -41,47 +41,36 @@ void recievePacket(String packet) {
     Serial.println(packet.begin());
   }
 
-  sendPacket("PACKET/RECEIVED", topic.begin());
-
   if (topic.equals("DEVICE/GET_VERSION")) {
     sendPacket("DEVICE/VERSION", VERSION);
   } else if (topic.equals("WIFI/GET_STATUS")) {
     sendWiFiStatus();
   } else if (topic.equals("WIFI/SET_SSID")) {
-    WifiSSID = content.begin();
+    WifiSSID = content;
   } else if (topic.equals("WIFI/SET_PASSWORD")) {
-    WifiPassword = content.begin();
+    WifiPassword = content;
   } else if (topic.equals("WIFI/GET_SSID")) {
-    if (WifiSSID == nullptr) {
-      sendPacket("WIFI/SSID", NO_CONTENT);
-    } else {
-      sendPacket("WIFI/SSID", WifiSSID);
-    }
+    sendPacket("WIFI/SSID", WifiSSID.begin());
   } else if (topic.equals("WIFI/GET_PASSWORD")) {
-    if (WifiPassword == nullptr) {
-      sendPacket("WIFI/PASSWORD", NO_CONTENT);
-    } else {
-      sendPacket("WIFI/PASSWORD", WifiPassword);
-    }
+    sendPacket("WIFI/PASSWORD", WifiPassword.begin());
   } else if (topic.equals("WIFI/DO_CONNECT")) {
-    if (WifiSSID == nullptr) {
-      sendPacket("WIFI/ERROR", NO_SSID);
-    } else if (WifiPassword == nullptr) {
-      sendPacket("WIFI/ERROR", NO_PASSWORD);
-    } else {
-      WiFi.begin(WifiSSID, WifiPassword);
-    }
-  } else if(topic.equals("WIFI/GET_LOCAL_IP")) {
-		sendPacket("WIFI/LOCAL_IP", WiFi.localIP().toString().begin());
-	}
+    WiFi.begin(WifiSSID.begin(), WifiPassword.begin());
+  } else if (topic.equals("WIFI/GET_LOCAL_IP")) {
+    sendPacket("WIFI/LOCAL_IP", WiFi.localIP().toString().begin());
+  } else {
+    sendPacket("PACKET/UNKNOWN", topic.begin());
+    return;
+  }
+
+  sendPacket("PACKET/SUCCESS", topic.begin());
 }
 
 void updateWiFi() {
-	int current = WiFi.status();
-	if(current != wifiStatus) {
-		wifiStatus = current;
-		sendWiFiStatus();
-	}
+  int current = WiFi.status();
+  if (current != wifiStatus) {
+    wifiStatus = current;
+    sendWiFiStatus();
+  }
 }
 
 void setup() {
