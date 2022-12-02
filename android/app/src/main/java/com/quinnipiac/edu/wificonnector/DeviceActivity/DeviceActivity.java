@@ -3,6 +3,7 @@ package com.quinnipiac.edu.wificonnector.DeviceActivity;
 import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -31,7 +32,6 @@ public class DeviceActivity extends AppCompatActivity {
     private static final int STATUS_NO_SHIELD = 255, STATUS_IDLE = 0, STATUS_NO_SSID = 1, STATUS_SCAN_COMPLETE = 2, STATUS_CONNECTED = 3, STATUS_CONNECTION_FAILED = 4,
             STATUS_CONNECTION_LOST = 5, STATUS_DISCONNECTED = 6;
 
-
     private final Set<Packet> outstandingPackets = new HashSet<>();
 
     private SimpleBluetoothDeviceInterface deviceInterface;
@@ -57,42 +57,25 @@ public class DeviceActivity extends AppCompatActivity {
         deviceLocalIP = findViewById(R.id.text_device_ip);
 
         findViewById(R.id.button_join_wifi).setOnClickListener((view) -> connectDeviceToWifi(inputSSID.getText().toString(), inputPassword.getText().toString()));
+        findViewById(R.id.button_connect_retry).setOnClickListener(view -> connectToDevice());
 
         bluetoothManager = BluetoothManager.getInstance();
+    }
+
+    @SuppressLint("CheckResult")
+    private void connectToDevice() {
+        bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(
+                Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(this::onConnected, this::onConnectionError);
+        deviceWifiStatus.setText("");
+        deviceWifiStatus.setText("");
+        deviceLocalIP.setText("");
+        deviceBluetoothStatus.setText(R.string.connecting);
     }
 
     private void connectDeviceToWifi(String ssid, String password) {
         sendPackerQueue(new Packet[]{
                 new Packet("WIFI/SET_SSID", ssid), new Packet("WIFI/SET_PASSWORD", password), new Packet("WIFI/DO_CONNECT")
         });
-    }
-
-    public void sendPackerQueue(Packet[] packets) {
-        for (int i = 0; i < packets.length - 1; i++) {
-            packets[i].addChild(packets[i + 1]);
-        }
-        sendPacket(packets[0]);
-    }
-
-    public void sendPacket(Packet packet) {
-        outstandingPackets.add(packet.send(deviceInterface));
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        bluetoothManager.closeDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
-    }
-
-    @SuppressLint("CheckResult")
-    @Override
-    protected void onResume() {
-        super.onResume();
-        bluetoothManager.openSerialDevice(getIntent().getStringExtra(MainActivity.KEY_MAC)).subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread()).subscribe(
-                this::onConnected, this::onConnectionError);
-        deviceWifiStatus.setText("");
-        deviceBluetoothStatus.setText(R.string.connecting);
-        setConfigurable(false);
     }
 
     private void onConnected(BluetoothSerialDevice device) {
@@ -102,11 +85,21 @@ public class DeviceActivity extends AppCompatActivity {
         sendPacket(new Packet("DEVICE/GET_VERSION"));
         deviceBluetoothStatus.setText(R.string.connected);
         setConfigurable(true);
+        findViewById(R.id.button_connect_retry).setVisibility(View.GONE);
     }
 
     private void onConnectionError(Throwable throwable) {
         Log.d(TAG, "onConnectionError: " + throwable.toString());
         deviceBluetoothStatus.setText(R.string.disconnected);
+        setConfigurable(false);
+        findViewById(R.id.button_connect_retry).setVisibility(View.VISIBLE);
+    }
+
+    public void sendPackerQueue(Packet[] packets) {
+        for (int i = 0; i < packets.length - 1; i++) {
+            packets[i].addChild(packets[i + 1]);
+        }
+        sendPacket(packets[0]);
     }
 
     private void onMessageReceived(String message) {
@@ -122,6 +115,22 @@ public class DeviceActivity extends AppCompatActivity {
 
     private void onCommunicationError(Throwable throwable) {
         Log.d(TAG, "onCommunicationError: " + throwable.toString());
+        bluetoothManager.closeDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
+        setConfigurable(false);
+        deviceBluetoothStatus.setText(R.string.disconnected);
+        deviceWifiStatus.setText("");
+        deviceLocalIP.setText("");
+        findViewById(R.id.button_connect_retry).setVisibility(View.VISIBLE);
+    }
+
+    public void sendPacket(Packet packet) {
+        outstandingPackets.add(packet.send(deviceInterface));
+    }
+
+    private void setConfigurable(boolean configurable) {
+        inputSSID.setEnabled(configurable);
+        inputPassword.setEnabled(configurable);
+        findViewById(R.id.button_join_wifi).setEnabled(configurable);
     }
 
     private void handlePacket(String topic, String content) {
@@ -179,20 +188,18 @@ public class DeviceActivity extends AppCompatActivity {
         } else {
             deviceLocalIP.setText("");
 
-            if(status == STATUS_IDLE) {
+            if (status == STATUS_IDLE) {
                 deviceWifiStatus.setText(R.string.wifi_idle);
-            } else if(status == STATUS_NO_SSID) {
+            } else if (status == STATUS_NO_SSID) {
                 deviceWifiStatus.setText(R.string.wifi_no_ssid);
-            } else if(status == STATUS_NO_SHIELD) {
+            } else if (status == STATUS_NO_SHIELD) {
                 deviceWifiStatus.setText(R.string.wifi_no_shield);
-            } else if(status == STATUS_DISCONNECTED) {
+            } else if (status == STATUS_DISCONNECTED) {
                 deviceWifiStatus.setText(R.string.wifi_disconnected);
-            } else if(status == STATUS_CONNECTION_LOST) {
+            } else if (status == STATUS_CONNECTION_LOST) {
                 deviceWifiStatus.setText(R.string.wifi_lost);
             }
-
         }
-
     }
 
     private void onWifiError(String error) {
@@ -214,17 +221,25 @@ public class DeviceActivity extends AppCompatActivity {
         deviceLocalIP.setText(ip);
     }
 
+    @Override
+    protected void onPause() {
+        super.onPause();
+        bluetoothManager.closeDevice(getIntent().getStringExtra(MainActivity.KEY_MAC));
+    }
+
+    @SuppressLint("CheckResult")
+    @Override
+    protected void onResume() {
+        super.onResume();
+        connectToDevice();
+        setConfigurable(false);
+    }
+
     private void sendPacket(String topic) {
         sendPacket(new Packet(topic));
     }
 
     private void sendPacket(String topic, String content) {
         sendPacket(new Packet(topic, content));
-    }
-
-    private void setConfigurable(boolean configurable) {
-        inputSSID.setEnabled(configurable);
-        inputPassword.setEnabled(configurable);
-        findViewById(R.id.button_join_wifi).setEnabled(configurable);
     }
 }

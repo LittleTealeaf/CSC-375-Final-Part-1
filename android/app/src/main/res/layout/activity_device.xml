@@ -4,6 +4,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
+        android:padding="20dp"
         tools:context=".DeviceActivity.DeviceActivity">
 
     <TextView
@@ -68,4 +69,11 @@
             android:layout_height="wrap_content"
             android:text="@string/button_connect"
             android:id="@+id/button_join_wifi" />
+    <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+        android:text="@string/retry_connection"
+        android:id="@+id/button_connect_retry"
+            android:visibility="gone"
+        />
 </LinearLayout>
