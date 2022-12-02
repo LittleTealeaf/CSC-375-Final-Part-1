@@ -12,7 +12,7 @@
 char VERSION[] = "1";
 char NO_CONTENT[] = "";
 char NO_SSID[] = "NO_SSID";
-chat NO_PASSWORD[] = "NO_PASSWORD";
+char NO_PASSWORD[] = "NO_PASSWORD";
 
 char *WifiSSID;
 char *WiFiPassword;
