@@ -27,54 +27,40 @@ BluetoothSerial Bluetooth;
 
 TFT_eSprite ScreenBuffer = TFT_eSprite(&M5.Lcd);
 
-String getWifiStatusString(int status) {
-  if (status == WL_NO_SHIELD) {
-    return "No Shield";
-  } else if (status == WL_IDLE_STATUS) {
-    return "Idle";
-  } else if (status == WL_NO_SSID_AVAIL) {
-    return "No SSID Found";
-  } else if (status == WL_SCAN_COMPLETED) {
-    return "Scan Completed";
-  } else if (status == WL_CONNECTED) {
-    return "Connected";
-  } else if (status == WL_CONNECT_FAILED) {
-    return "Connection Failed";
-  } else if (status == WL_CONNECTION_LOST) {
-    return "Connection Lost";
-  } else if (status == WL_DISCONNECTED) {
-    return "Disconnected";
-  } else {
-    return "";
-  }
-}
-
-void updateScreen() { 
+void updateScreen() {
 	ScreenBuffer.fillScreen(TFT_BLACK);
 	ScreenBuffer.setCursor(0, 0);
 	ScreenBuffer.setTextSize(2);
 
+	ScreenBuffer.printf("Bluetooth: %s\n\n", Bluetooth.connected() ? "Connected" : "Not Connected");
+	
+	ScreenBuffer.print("WiFi: ");
 
-	ScreenBuffer.printf("Mac: %s\n\n", WiFi.macAddress().begin());
-
-	if(Bluetooth.connected()) {
-		ScreenBuffer.println("Bluetooth: Connected");
-	} else {
-		ScreenBuffer.println("Bluetooth: Not Connected");
+	if(wifiStatus == WL_NO_SHIELD) {
+		ScreenBuffer.print("No Shield");
+	} else if(wifiStatus == WL_IDLE_STATUS) {
+		ScreenBuffer.print("Idle");
+	} else if(wifiStatus == WL_NO_SSID_AVAIL) {
+		ScreenBuffer.print("No SSID Available");
+	} else if(wifiStatus == WL_SCAN_COMPLETED) {
+		ScreenBuffer.print("Scan Completed");
+	} else if(wifiStatus == WL_CONNECTED) {
+		ScreenBuffer.print("Connected");
+	} else if(wifiStatus == WL_CONNECT_FAILED) {
+		ScreenBuffer.print("Connection Failed");
+	} else if(wifiStatus == WL_CONNECTION_LOST) {
+		ScreenBuffer.print("Connection Lost");
+	} else if(wifiStatus == WL_DISCONNECTED) {
+		ScreenBuffer.print("Disconnected");
 	}
-
+	
 	ScreenBuffer.println();
 
-
-	ScreenBuffer.printf("Wifi: %s\n",getWifiStatusString(wifiStatus).begin());
+	ScreenBuffer.println(WifiSSID);
 
 	if(wifiStatus == WL_CONNECTED) {
-		ScreenBuffer.println();
-		ScreenBuffer.printf("Connected To: %s\n", WifiSSID.begin());
-		ScreenBuffer.println();
-		ScreenBuffer.printf("IP: %s",WiFi.localIP().toString().begin());
+		ScreenBuffer.println(WiFi.localIP());
 	}
-
 
 	ScreenBuffer.pushSprite(0, 0);
 }
@@ -129,7 +115,7 @@ void updateWiFi() {
   if (current != wifiStatus) {
     wifiStatus = current;
     sendWiFiStatus();
-    updateScreen();
+		updateScreen();
   }
 }
 
