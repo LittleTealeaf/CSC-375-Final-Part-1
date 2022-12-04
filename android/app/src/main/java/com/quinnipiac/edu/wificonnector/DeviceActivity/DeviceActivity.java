@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.Nullable;
@@ -34,6 +35,7 @@ public class DeviceActivity extends AppCompatActivity {
 
     private SimpleBluetoothDeviceInterface deviceInterface;
     private BluetoothManager bluetoothManager;
+    private DebugAdapter debugAdapter;
 
     private TextView deviceWifiStatus, deviceBluetoothStatus, deviceLocalIP;
 
@@ -58,6 +60,9 @@ public class DeviceActivity extends AppCompatActivity {
         findViewById(R.id.button_connect_retry).setOnClickListener(view -> connectToDevice());
 
         bluetoothManager = BluetoothManager.getInstance();
+
+
+        ((ListView) findViewById(R.id.device_debug_log)).setAdapter(debugAdapter = new DebugAdapter(this));
     }
 
     @Override
@@ -164,6 +169,9 @@ public class DeviceActivity extends AppCompatActivity {
             case "WIFI/LOCAL_IP":
                 onWifiLocalIP(content);
                 break;
+            case "DEBUG/LOG":
+                onDebugLog(content);
+                break;
             default:
                 Log.d(TAG, "handlePacket: Unknown Message " + content);
         }
@@ -236,6 +244,11 @@ public class DeviceActivity extends AppCompatActivity {
 
     private void sendPacket(String topic) {
         sendPacket(new Packet(topic));
+    }
+
+    private void onDebugLog(String message) {
+        Log.d(TAG, "onDebugLog: " + message);
+        debugAdapter.addDebug(message);
     }
 
     private void sendPacket(String topic, String content) {

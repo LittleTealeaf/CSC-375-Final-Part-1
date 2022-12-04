@@ -39,13 +39,13 @@
             android:layout_gravity="center_horizontal"
             android:id="@+id/text_device_wifi"
             android:textSize="17sp" />
+
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-        android:id="@+id/text_device_ip"
-        android:textSize="17sp"
-        android:layout_gravity="center_horizontal"
-        />
+            android:id="@+id/text_device_ip"
+            android:textSize="17sp"
+            android:layout_gravity="center_horizontal" />
 
     <EditText
             android:layout_width="match_parent"
@@ -69,11 +69,18 @@
             android:layout_height="wrap_content"
             android:text="@string/button_connect"
             android:id="@+id/button_join_wifi" />
+
     <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-        android:text="@string/retry_connection"
-        android:id="@+id/button_connect_retry"
-            android:visibility="gone"
-        />
+            android:text="@string/retry_connection"
+            android:id="@+id/button_connect_retry"
+            android:visibility="gone" />
+
+    <ListView
+            android:layout_width="wrap_content"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:id="@+id/device_debug_log"
+            />
 </LinearLayout>
