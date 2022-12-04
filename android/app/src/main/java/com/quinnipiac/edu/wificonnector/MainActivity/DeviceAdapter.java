@@ -11,7 +11,6 @@ import android.widget.BaseAdapter;
 import android.widget.TextView;
 
 import androidx.core.app.ActivityCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.quinnipiac.edu.wificonnector.R;
 
@@ -21,8 +20,8 @@ import java.util.List;
 public class DeviceAdapter extends BaseAdapter {
 
     private final Context context;
-    private List<BluetoothDevice> devices;
     private final LayoutInflater inflater;
+    private List<BluetoothDevice> devices;
 
     public DeviceAdapter(Context context) {
         this.devices = new LinkedList<>();
@@ -37,7 +36,7 @@ public class DeviceAdapter extends BaseAdapter {
 
     public void addDevice(BluetoothDevice device) {
         if (devices.stream().anyMatch(d -> d.getAddress().equals(device.getAddress()))) {
-           return;
+            return;
         }
         this.devices.add(device);
         notifyDataSetChanged();

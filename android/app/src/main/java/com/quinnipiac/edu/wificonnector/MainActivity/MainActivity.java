@@ -105,7 +105,6 @@ public class MainActivity extends AppCompatActivity {
 
     public void loadDevices() {
 
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.BLUETOOTH_SCAN);
             return;
