@@ -9,6 +9,10 @@
 #define SEP ":"
 #define EOL '\n'
 
+#define SPRITE_COLOR_DEPTH 4
+#define SCREEN_WIDTH 320
+#define SCREEN_HEIGHT 240
+
 char VERSION[] = "1";
 char NO_CONTENT[] = "";
 char NO_SSID[] = "NO_SSID";
@@ -17,8 +21,63 @@ char NO_PASSWORD[] = "NO_PASSWORD";
 String WifiSSID = "";
 String WifiPassword = "";
 int wifiStatus;
+bool bluetoothStatus;
 
 BluetoothSerial Bluetooth;
+
+TFT_eSprite ScreenBuffer = TFT_eSprite(&M5.Lcd);
+
+String getWifiStatusString(int status) {
+  if (status == WL_NO_SHIELD) {
+    return "No Shield";
+  } else if (status == WL_IDLE_STATUS) {
+    return "Idle";
+  } else if (status == WL_NO_SSID_AVAIL) {
+    return "No SSID Found";
+  } else if (status == WL_SCAN_COMPLETED) {
+    return "Scan Completed";
+  } else if (status == WL_CONNECTED) {
+    return "Connected";
+  } else if (status == WL_CONNECT_FAILED) {
+    return "Connection Failed";
+  } else if (status == WL_CONNECTION_LOST) {
+    return "Connection Lost";
+  } else if (status == WL_DISCONNECTED) {
+    return "Disconnected";
+  } else {
+    return "";
+  }
+}
+
+void updateScreen() { 
+	ScreenBuffer.fillScreen(TFT_BLACK);
+	ScreenBuffer.setCursor(0, 0);
+	ScreenBuffer.setTextSize(2);
+
+
+	ScreenBuffer.printf("Mac: %s\n\n", WiFi.macAddress().begin());
+
+	if(Bluetooth.connected()) {
+		ScreenBuffer.println("Bluetooth: Connected");
+	} else {
+		ScreenBuffer.println("Bluetooth: Not Connected");
+	}
+
+	ScreenBuffer.println();
+
+
+	ScreenBuffer.printf("Wifi: %s\n",getWifiStatusString(wifiStatus).begin());
+
+	if(wifiStatus == WL_CONNECTED) {
+		ScreenBuffer.println();
+		ScreenBuffer.printf("Connected To: %s\n", WifiSSID.begin());
+		ScreenBuffer.println();
+		ScreenBuffer.printf("IP: %s",WiFi.localIP().toString().begin());
+	}
+
+
+	ScreenBuffer.pushSprite(0, 0);
+}
 
 void sendPacket(const char *topic, char *content) {
   if (Bluetooth.connected()) {
@@ -70,7 +129,15 @@ void updateWiFi() {
   if (current != wifiStatus) {
     wifiStatus = current;
     sendWiFiStatus();
+    updateScreen();
   }
+}
+
+void updateBluetooth() {
+	if(bluetoothStatus != Bluetooth.connected()) {
+		bluetoothStatus = !bluetoothStatus;
+		updateScreen();
+	}
 }
 
 void setup() {
@@ -79,6 +146,14 @@ void setup() {
   Bluetooth.begin("Littletealeaf/CSC-375-Final");
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
+
+	bluetoothStatus = false;
+
+  ScreenBuffer.setColorDepth(SPRITE_COLOR_DEPTH);
+  ScreenBuffer.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT);
+  ScreenBuffer.fillScreen(TFT_BLACK);
+  ScreenBuffer.pushSprite(0, 0);
+  updateScreen();
 }
 
 void loop() {
@@ -87,4 +162,5 @@ void loop() {
     recievePacket(packet);
   }
   updateWiFi();
+	updateBluetooth();
 }
