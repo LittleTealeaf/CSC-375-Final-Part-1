@@ -21,7 +21,7 @@ char NO_PASSWORD[] = "NO_PASSWORD";
 String WifiSSID = "";
 String WifiPassword = "";
 int wifiStatus;
-bool bluetoothStatus;
+int updateScreenCounter;
 
 BluetoothSerial Bluetooth;
 
@@ -115,15 +115,7 @@ void updateWiFi() {
   if (current != wifiStatus) {
     wifiStatus = current;
     sendWiFiStatus();
-		updateScreen();
   }
-}
-
-void updateBluetooth() {
-	if(bluetoothStatus != Bluetooth.connected()) {
-		bluetoothStatus = !bluetoothStatus;
-		updateScreen();
-	}
 }
 
 void setup() {
@@ -133,13 +125,11 @@ void setup() {
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
-	bluetoothStatus = false;
-
   ScreenBuffer.setColorDepth(SPRITE_COLOR_DEPTH);
   ScreenBuffer.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT);
   ScreenBuffer.fillScreen(TFT_BLACK);
   ScreenBuffer.pushSprite(0, 0);
-  updateScreen();
+	updateScreenCounter = 5;	
 }
 
 void loop() {
@@ -148,5 +138,9 @@ void loop() {
     recievePacket(packet);
   }
   updateWiFi();
-	updateBluetooth();
+	if(updateScreenCounter <= 0) {
+		updateScreenCounter = 5;
+		updateScreen();
+	}
+	updateScreenCounter--;
 }
