@@ -121,7 +121,7 @@ void updateWiFi() {
 void setup() {
   M5.begin();
   Serial.begin(115200);
-  Bluetooth.begin("Littletealeaf/CSC-375-Final");
+  Bluetooth.begin("takwashnak/CSC-375-Final");
   WiFi.mode(WIFI_STA);
   WiFi.disconnect();
 
