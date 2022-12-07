@@ -28,41 +28,42 @@ BluetoothSerial Bluetooth;
 TFT_eSprite ScreenBuffer = TFT_eSprite(&M5.Lcd);
 
 void updateScreen() {
-	ScreenBuffer.fillScreen(TFT_BLACK);
-	ScreenBuffer.setCursor(0, 0);
-	ScreenBuffer.setTextSize(2);
+  ScreenBuffer.fillScreen(TFT_BLACK);
+  ScreenBuffer.setCursor(0, 0);
+  ScreenBuffer.setTextSize(2);
 
-	ScreenBuffer.printf("Bluetooth: %s\n\n", Bluetooth.connected() ? "Connected" : "Not Connected");
-	
-	ScreenBuffer.print("WiFi: ");
+  ScreenBuffer.printf("Bluetooth: %s\n\n",
+                      Bluetooth.connected() ? "Connected" : "Not Connected");
 
-	if(wifiStatus == WL_NO_SHIELD) {
-		ScreenBuffer.print("No Shield");
-	} else if(wifiStatus == WL_IDLE_STATUS) {
-		ScreenBuffer.print("Idle");
-	} else if(wifiStatus == WL_NO_SSID_AVAIL) {
-		ScreenBuffer.print("No SSID Available");
-	} else if(wifiStatus == WL_SCAN_COMPLETED) {
-		ScreenBuffer.print("Scan Completed");
-	} else if(wifiStatus == WL_CONNECTED) {
-		ScreenBuffer.print("Connected");
-	} else if(wifiStatus == WL_CONNECT_FAILED) {
-		ScreenBuffer.print("Connection Failed");
-	} else if(wifiStatus == WL_CONNECTION_LOST) {
-		ScreenBuffer.print("Connection Lost");
-	} else if(wifiStatus == WL_DISCONNECTED) {
-		ScreenBuffer.print("Disconnected");
-	}
-	
-	ScreenBuffer.println();
+  ScreenBuffer.print("WiFi: ");
 
-	ScreenBuffer.println(WifiSSID);
+  if (wifiStatus == WL_NO_SHIELD) {
+    ScreenBuffer.print("No Shield");
+  } else if (wifiStatus == WL_IDLE_STATUS) {
+    ScreenBuffer.print("Idle");
+  } else if (wifiStatus == WL_NO_SSID_AVAIL) {
+    ScreenBuffer.print("No SSID Available");
+  } else if (wifiStatus == WL_SCAN_COMPLETED) {
+    ScreenBuffer.print("Scan Completed");
+  } else if (wifiStatus == WL_CONNECTED) {
+    ScreenBuffer.print("Connected");
+  } else if (wifiStatus == WL_CONNECT_FAILED) {
+    ScreenBuffer.print("Connection Failed");
+  } else if (wifiStatus == WL_CONNECTION_LOST) {
+    ScreenBuffer.print("Connection Lost");
+  } else if (wifiStatus == WL_DISCONNECTED) {
+    ScreenBuffer.print("Disconnected");
+  }
 
-	if(wifiStatus == WL_CONNECTED) {
-		ScreenBuffer.println(WiFi.localIP());
-	}
+  ScreenBuffer.println();
 
-	ScreenBuffer.pushSprite(0, 0);
+  ScreenBuffer.println(WifiSSID);
+
+  if (wifiStatus == WL_CONNECTED) {
+    ScreenBuffer.println(WiFi.localIP());
+  }
+
+  ScreenBuffer.pushSprite(0, 0);
 }
 
 void sendPacket(const char *topic, char *content) {
@@ -129,7 +130,7 @@ void setup() {
   ScreenBuffer.createSprite(SCREEN_WIDTH, SCREEN_HEIGHT);
   ScreenBuffer.fillScreen(TFT_BLACK);
   ScreenBuffer.pushSprite(0, 0);
-	updateScreenCounter = 5;	
+  updateScreenCounter = 5;
 }
 
 void loop() {
@@ -138,9 +139,9 @@ void loop() {
     recievePacket(packet);
   }
   updateWiFi();
-	if(updateScreenCounter <= 0) {
-		updateScreenCounter = 5;
-		updateScreen();
-	}
-	updateScreenCounter--;
+  if (updateScreenCounter <= 0) {
+    updateScreenCounter = 5;
+    updateScreen();
+  }
+  updateScreenCounter--;
 }
